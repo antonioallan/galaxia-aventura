@@ -1,0 +1,11 @@
+{
+  "name": "galaxia-aventura",
+  "version": "0.1.0",
+  "description": "Aventuras de livro-jogo para crianças, em português, que rodam direto no navegador.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "validar": "node tools/validar.js",
+    "servir": "python3 -m http.server 8765 --directory aventuras"
+  }
+}

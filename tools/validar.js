@@ -117,6 +117,32 @@ for (const [k, it] of Object.entries(ITEMS)) {
   if (it.type !== 'shield' && typeof it.v !== 'number') erro(`item "${k}": falta o valor "v"`);
 }
 
+/* ---------- 4b. troca de nomes (nomes.js) ---------- */
+if (typeof get('nomes') === 'function') {
+  const nomes = get('nomes'), caso = (rot, html, cfg, esperado) => {
+    const r = nomes(html, cfg); if (r !== esperado) erro(`nomes(): ${rot}\n     esperado: ${esperado}\n     obtido:   ${r}`);
+  };
+  const maria = { kay: { n: 'Maria', g: 'F' } };
+  caso('sem personalização não muda nada', 'O Kay e a Liv', {}, 'O Kay e a Liv');
+  caso('troca de menino para menina ajusta artigos', 'O Kay pegou o chapéu do Kay', maria, 'A Maria pegou o chapéu da Maria');
+  caso('não troca o "o" que não é artigo do nome', 'Ele viu o mar e o Kay', maria, 'Ele viu o mar e a Maria');
+  caso('mesmo gênero mantém o artigo', 'a Liv e da Liv', { liv: { n: 'Ana', g: 'F' } }, 'a Ana e da Ana');
+  caso('menina para menino', 'na Lia, da Lia, A Lia', { lia: { n: 'Théo', g: 'M' } }, 'no Théo, do Théo, O Théo');
+  caso('nome composto inteiro', 'Bilu Bilu e Pegasus', { bilu: { n: 'Davi', g: 'M' } }, 'Davi e Pegasus');
+  caso('não altera tags HTML', '<button onclick="go(\'Kay\')">Kay</button>', maria, '<button onclick="go(\'Kay\')">Maria</button>');
+  caso('não troca dentro de outras palavras', 'Livro Mágico, Kayak, Julia', { liv: { n: 'Ana' }, kay: { n: 'Zé' }, lia: { n: 'Bia' } }, 'Livro Mágico, Kayak, Julia');
+  caso('remove caracteres de HTML do nome', 'Kay', { kay: { n: '<b>x</b>' } }, 'bx/b');
+  caso('nome em branco volta ao original', 'Kay', { kay: { n: '   ', g: 'F' } }, 'Kay');
+  const faceDe = get('faceDe'), face = (rot, heroi, cfg, esperado) => {
+    const r = faceDe(heroi, cfg); if (r !== esperado) erro(`faceDe(): ${rot} (esperado ${esperado}, obtido ${r})`);
+  };
+  face('sem personalização mantém o rosto original', { name: 'Kay', face: '🧒' }, {}, '🧒');
+  face('menino vira menina', { name: 'Kay', face: '🧒' }, { kay: { n: 'Maria', g: 'F' } }, '👧');
+  face('menina vira menino', { name: 'Liv', face: '🦸‍♀️' }, { liv: { n: 'Théo', g: 'M' } }, '🦸‍♂️');
+  face('herói sem slot mantém o rosto', { name: 'Faísca', face: '🐲' }, { kay: { g: 'F' } }, '🐲');
+  for (const s of get('SLOTS')) for (const g of ['M', 'F']) if (!s.faces[g]) erro(`SLOTS: "${s.id}" sem rosto para o gênero ${g}`);
+}
+
 /* ---------- 5. arquivos do modo offline (sw.js) ---------- */
 const sw = fs.readFileSync(path.join(RAIZ, 'sw.js'), 'utf8');
 const lista = [...(sw.match(/ARQUIVOS\s*=\s*\[([\s\S]*?)\]/) || [, ''])[1].matchAll(/'([^']+)'/g)].map(m => m[1]);

@@ -189,7 +189,7 @@ function mapHTML(){
   s+=`</g>`}
  /* heróis em cima da fase escolhida */
  const [hx,hy]=P[NODE[sel]];
- s+=`<g transform="translate(${hx},${hy-34})"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur=".8s" repeatCount="indefinite"/><rect x="-31" y="-11" width="62" height="22" rx="11" fill="#ffffffd9"/><text font-size="15" text-anchor="middle" dominant-baseline="central">${HEROES.map(x=>x.face).join('')}</text></g></g>`;
+ s+=`<g transform="translate(${hx},${hy-34})"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur=".8s" repeatCount="indefinite"/><rect x="-31" y="-11" width="62" height="22" rx="11" fill="#ffffffd9"/><text font-size="15" text-anchor="middle" dominant-baseline="central">${HEROES.map(x=>faceDe(x)).join('')}</text></g></g>`;
  if(extra)s+=`<text x="205" y="${MH-12}" font-size="11" font-weight="800" text-anchor="middle" fill="#b0307a">${M.extra.label}</text>`;
  s+=`</svg>`;
  const p=PROG[sel];
@@ -245,8 +245,9 @@ function worldsHTML(){
  for(const w in WORLDS)s+=planetSVG(w,WORLDS[w].planet,sel===w);
  s+=`</svg>`;
  let h=`<div class="maptop"><div class="title">🌌 Galáxia das Aventuras</div><div class="mapsub">Toque num planeta para escolher o mundo</div></div><div class="split"><div class="pmap"><div class="wwrap">${s}</div></div><div class="pside">`;
- if(WORLDS[sel]){const W=WORLDS[sel],pr=ALLPROG[sel]||{},base=Object.keys(W.chapters).filter(n=>!W.chapters[n].special),d=base.filter(n=>pr[n]).length;
-  h+=`<div class="lvcard"><div class="lvn">Planeta</div><div class="lvt">${W.icon} ${W.name}</div><div class="lvs">${W.desc}</div><div class="wheroes">${W.heroes.map(x=>x.face).join(' ')}</div><div class="lvs">⭐ ${d} de ${base.length} fases${d===base.length?' · 🏆':''}</div><button class="btn go" onclick="enterWorld('${sel}');go('menu')">🚀 Viajar para este mundo!</button></div>`}
+ if(window._ed)h+=editorNomesHTML();
+ else if(WORLDS[sel]){const W=WORLDS[sel],pr=ALLPROG[sel]||{},base=Object.keys(W.chapters).filter(n=>!W.chapters[n].special),d=base.filter(n=>pr[n]).length;
+  h+=`<div class="lvcard"><div class="lvn">Planeta</div><div class="lvt">${W.icon} ${W.name}</div><div class="lvs">${W.desc}</div><div class="wheroes">${W.heroes.map(x=>faceDe(x)).join(' ')}</div><div class="lvs">⭐ ${d} de ${base.length} fases${d===base.length?' · 🏆':''}</div><button class="btn go" onclick="enterWorld('${sel}');go('menu')">🚀 Viajar para este mundo!</button></div><button class="btn reset" onclick="abrirNomes()">✏️ Personalizar nomes</button>`}
  else h+=`<div class="lvcard"><div class="lvn">Planeta misterioso</div><div class="lvt">❓ Em breve</div><div class="lvs">Um novo mundo, com novos heróis e aventuras, está sendo criado...</div></div>`;
  h+=`</div></div>`;
  return h;
@@ -256,8 +257,8 @@ function startFrom(n){for(const k of Object.keys(CH).map(Number))if(k<n&&!PROG[k
 function render(){
  const sc=SC[S.scene];
  $('app').className='wrap'+(sc.mundos?' wide gal':sc.menu?' wide map':'');if(sc.menu)$('app').style.setProperty('--sea',WORLDS[WORLD].map.sea);
- if(sc.mundos){$('app').innerHTML=worldsHTML();return}
- if(sc.menu){$('app').innerHTML=mapHTML();return}
+ if(sc.mundos){$('app').innerHTML=nomes(worldsHTML());return}
+ if(sc.menu){$('app').innerHTML=nomes(mapHTML());return}
  let h=hud();
  if(sc.battle){
   const B=sc.battle,b=S.b;
@@ -273,7 +274,7 @@ function render(){
     h+=`<button class="btn carrot" onclick="useItem('${k}')">Usar ${it.name} (${it.desc})</button>`}
    if(b.shield)h+=`<div class="ask">🛡️ Proteção ativada!</div>`;
    const H=heroes();
-   h+=`<div class="ask">Quem vai atacar? 🎲</div><div class="heroes" style="grid-template-columns:repeat(${H.length===4?2:3},1fr)">${H.map((x,i)=>`<button class="hero" onclick="attack(${i})"><b>${x.face}</b>${x.name}<small>${x.move}</small></button>`).join('')}</div>`;
+   h+=`<div class="ask">Quem vai atacar? 🎲</div><div class="heroes" style="grid-template-columns:repeat(${H.length===4?2:3},1fr)">${H.map((x,i)=>`<button class="hero" onclick="attack(${i})"><b>${faceDe(x)}</b>${x.name}<small>${x.move}</small></button>`).join('')}</div>`;
    h+=`<div class="rules">🎲 1-2: errou · 3-4: acertou · 5-6: SUPER ataque!<br>Tirou 6? Ganha ⭐</div>`;
   }
  } else if(sc.test){
@@ -306,7 +307,7 @@ function render(){
    h+=`<div class="ask">⭐ Fase ${S.ch} concluída no mapa!</div><button class="btn go" onclick="reset()">🗺️ Voltar ao mapa</button>`;
   } else sc.choices.forEach((c,i)=>{if(c[2]&&!amigo(c[2]))return;h+=`<button class="btn ${i?'b2':''}" onclick="choose(${i})">${c[0]}</button>`});
  }
- $('app').innerHTML=h+tools();
+ $('app').innerHTML=nomes(h+tools());
 }
 function choose(i){go(SC[S.scene].choices[i][1])}
 function test(){

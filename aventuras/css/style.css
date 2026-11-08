@@ -117,3 +117,13 @@ body{margin:0;font-family:'Baloo 2',system-ui,sans-serif;background:linear-gradi
  .wide .adj{background:#ffffffd9;border-radius:16px;padding:6px 8px;margin-top:12px}
  .wide .adjlink{opacity:.6}
 }
+/* ===== Personalizar nomes ===== */
+.nmedit{text-align:left}
+.nmedit .lvn,.nmedit .lvt,.nmedit .lvs{text-align:center}
+.nmgrupo{font-size:13px;font-weight:800;color:var(--pri);text-transform:uppercase;letter-spacing:1px;margin:12px 0 4px}
+.nmrow{display:flex;align-items:center;gap:6px;margin-top:6px}
+.nmface{font-size:28px;width:34px;text-align:center}
+.nmrow input,.nmrow select{font:inherit;font-size:17px;font-weight:700;color:var(--ink);border:2px solid #7b5cff44;border-radius:12px;padding:6px 8px;background:#fff;min-width:0}
+.nmrow input{flex:1}
+.nmrow input:focus,.nmrow select:focus{outline:none;border-color:var(--pri)}
+.nmedit .adjlink{display:block;margin:10px auto 0}

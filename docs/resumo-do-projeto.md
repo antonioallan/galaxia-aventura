@@ -27,6 +27,7 @@ galaxia-aventura/
     └── js/
         ├── reino-cenas.js       # Mundo 1: heróis (HEROES), SLIP e cenas dos caps. 1–4
         ├── engine.js            # tabela CH, estado, dado, batalhas, mapas, galáxia, progresso
+        ├── nomes.js             # nomes personalizáveis dos heróis
         ├── pwa.js               # registra o service worker
         └── mundos/
             ├── reino-cap5-10.js     # Mundo 1: capítulos 5 a 10
@@ -98,9 +99,20 @@ A galáxia também exibe um planeta misterioso "Em breve", indicando espaço par
 - **Mapa do mundo** (`mapHTML`): caminho SVG com nós por capítulo, ilhas, decorações e uma seção "Capítulos Especiais".
 - Visual colorido, botões grandes estilo "3D", fonte arredondada e muitos emojis como arte.
 
+## Nomes personalizáveis
+
+Na galáxia, o botão **✏️ Personalizar nomes** abre um formulário com os seis heróis principais (Bilu Bilu, Pegasus, Kay, Liv, Lia e Bolota). Para cada um a família escolhe um nome e se é menino ou menina.
+
+- As histórias continuam escritas com os nomes originais. `nomes(html)` (em `js/nomes.js`) troca os nomes **só no texto mostrado**, chamado por `render()`; tags HTML e lógica (como as frases de falha, indexadas por nome) não mudam.
+- Ao mudar o gênero, os artigos acompanham: "o chapéu do Kay" vira "o chapéu da Maria".
+- O emoji do herói também acompanha o gênero (`faceDe()`, usando `faces` de cada slot) na batalha, no cartão da galáxia e no marcador do mapa.
+- Limite conhecido: adjetivos e pronomes no texto ("ficou tontinho", "ele") não mudam com o gênero. Emojis dentro da arte das cenas também permanecem os originais.
+- Para tornar outro personagem personalizável, inclua-o em `SLOTS`. Os testes de `nomes()` ficam em `tools/validar.js`.
+- Salvo em `localStorage`, chave `rpg_nomes`.
+
 ## Persistência
 
-Progresso salvo em `localStorage` na chave `rpg_mundos_prog`, separado por mundo (`reino`, `florescer`...). Há migração automática da chave antiga `rpg_bilu_prog` para o Mundo 1. Também existe uma opção discreta de ajuste de progresso (pular para um capítulo) e de reiniciar o progresso.
+Progresso salvo em `localStorage` na chave `rpg_mundos_prog` (os nomes escolhidos ficam em `rpg_nomes`), separado por mundo (`reino`, `florescer`...). Há migração automática da chave antiga `rpg_bilu_prog` para o Mundo 1. Também existe uma opção discreta de ajuste de progresso (pular para um capítulo) e de reiniciar o progresso.
 
 ## Como estender
 

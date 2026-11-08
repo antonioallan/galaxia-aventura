@@ -2,11 +2,17 @@
 
 Aventuras de livro-jogo para crianças, **em português do Brasil**, que rodam direto no navegador. Sem anúncios, sem cadastro, sem coleta de dados.
 
+Os heróis podem ter o **nome da própria criança**: na galáxia, o botão ✏️ *Personalizar nomes* troca o nome em toda a história.
+
 A criança (de preferência junto com um adulto) escolhe um mundo, depois um capítulo no mapa, e vive uma história com escolhas, testes de dado e batalhas divertidas, em que ninguém se machuca de verdade.
 
 ## Como jogar
 
-Abra `aventuras/index.html` no navegador. Ou, para testar também o modo offline (instalável no celular):
+▶️ **Jogar agora:** <https://antonioallan.github.io/galaxia-aventura/> (funciona no celular e pode ser instalado na tela inicial)
+
+Ou rode localmente:
+
+Abra `aventuras/index.html` no navegador. Para testar também o modo offline (instalável no celular):
 
 ```bash
 npm run servir      # ou: python3 -m http.server 8765 --directory aventuras
@@ -28,6 +34,7 @@ aventuras/
 ├── js/
 │   ├── reino-cenas.js    # heróis e cenas do Mundo 1 (caps. 1–4)
 │   ├── engine.js         # motor: dado, batalhas, mapas, galáxia, progresso
+│   ├── nomes.js          # nomes personalizáveis dos heróis
 │   ├── pwa.js            # registro do service worker
 │   └── mundos/           # capítulos restantes de cada mundo
 ├── icons/  manifest.webmanifest  sw.js   # PWA / modo offline
@@ -47,9 +54,13 @@ O script confere se toda cena citada existe, se cada capítulo tem um final alca
 
 > Ao alterar qualquer arquivo do jogo, aumente o número de `CACHE` em `aventuras/sw.js` para que quem já instalou receba a versão nova.
 
+## Publicação
+
+O workflow `.github/workflows/pages.yml` roda o validador e, a cada push na `main`, publica a pasta `aventuras/` no GitHub Pages. Em pull requests, roda só a validação. Para ativar uma vez: no GitHub, **Settings → Pages → Source: GitHub Actions**.
+
 ## Progresso e privacidade
 
-O progresso fica apenas no `localStorage` do navegador do jogador (chave `rpg_mundos_prog`). Nada é enviado para nenhum servidor e não há requisições a serviços externos.
+O progresso (`rpg_mundos_prog`) e os nomes escolhidos (`rpg_nomes`) ficam apenas no `localStorage` do navegador do jogador. Nada é enviado para nenhum servidor e não há requisições a serviços externos.
 
 ## Licença
 

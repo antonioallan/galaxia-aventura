@@ -1,0 +1,46 @@
+# Valida o conteúdo do jogo e publica a pasta aventuras/ no GitHub Pages.
+# Em pull requests roda só a validação; a publicação acontece em push na branch main.
+name: Validar e publicar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validar cenas, itens, mapas e arquivos do modo offline
+        run: npm run validar
+
+  publicar:
+    if: github.event_name != 'pull_request'
+    needs: validar
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: aventuras
+      - id: deploy
+        uses: actions/deploy-pages@v4

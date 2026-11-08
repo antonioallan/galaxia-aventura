@@ -59,7 +59,9 @@ function editorNomesHTML(){
    `<select id="ng_${s.id}" aria-label="Menino ou menina" onchange="mudaFaceNomes('${s.id}',this.value)"><option value="M"${g==='M'?' selected':''}>Menino</option><option value="F"${g==='F'?' selected':''}>Menina</option></select></div>`}
  return `<div class="lvcard nmedit"><div class="lvn">Personalizar</div><div class="lvt">✏️ Quem vai jogar?</div>`+
   `<div class="lvs">Escreva o nome da criança no lugar de um herói. A história usa o nome em todo lugar.</div>${h}`+
-  `<button class="btn go" onclick="salvarNomes()">💾 Salvar nomes</button>`+
+  `<div class="nmgrupo">Dado</div><div class="nmrow"><span class="nmface">🎲</span><select id="dado_modo" aria-label="Tipo de dado"><option value="digital"${dadoFisico()?'':' selected'}>Dado do jogo (na tela)</option><option value="fisico"${dadoFisico()?' selected':''}>Meu dado de verdade</option></select></div>`+
+  `<div class="lvs nmdica">Com dado de verdade, vocês rolam e tocam no número que saiu.</div>`+
+  `<button class="btn go" onclick="salvarNomes()">💾 Salvar</button>`+
   `<button class="btn reset" onclick="restaurarNomes()">↩️ Voltar aos nomes originais</button>`+
   `<button class="adjlink" onclick="fecharNomes()">Cancelar</button></div>`;
 }
@@ -71,6 +73,7 @@ function salvarNomes(){
   const n=limparNome($('nm_'+s.id).value)||s.orig,g=$('ng_'+s.id).value==='F'?'F':'M';
   if(n!==s.orig||g!==s.g)cfg[s.id]={n,g}}
  try{localStorage.setItem(NOMES_CHAVE,JSON.stringify(cfg))}catch(e){}
+ guardarModoDado($('dado_modo').value==='fisico');
  fecharNomes();
 }
 function restaurarNomes(){

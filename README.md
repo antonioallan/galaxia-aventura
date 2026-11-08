@@ -2,7 +2,7 @@
 
 Aventuras de livro-jogo para crianças, **em português do Brasil**, que rodam direto no navegador. Sem anúncios, sem cadastro, sem coleta de dados.
 
-Os heróis podem ter o **nome da própria criança**: na galáxia, o botão ✏️ *Personalizar nomes* troca o nome em toda a história.
+Os heróis podem ter o **nome da própria criança**: na galáxia, o botão ✏️ *Personalizar nomes* troca o nome em toda a história, e também dá para jogar com o **seu dado de verdade**, tocando na tela o número que saiu.
 
 A criança (de preferência junto com um adulto) escolhe um mundo, depois um capítulo no mapa, e vive uma história com escolhas, testes de dado e batalhas divertidas, em que ninguém se machuca de verdade.
 
@@ -35,6 +35,7 @@ aventuras/
 │   ├── reino-cenas.js    # heróis e cenas do Mundo 1 (caps. 1–4)
 │   ├── engine.js         # motor: dado, batalhas, mapas, galáxia, progresso
 │   ├── nomes.js          # nomes personalizáveis dos heróis
+│   ├── dado.js           # opção de usar um dado de verdade
 │   ├── pwa.js            # registro do service worker
 │   └── mundos/           # capítulos restantes de cada mundo
 ├── icons/  manifest.webmanifest  sw.js   # PWA / modo offline
@@ -60,7 +61,7 @@ O workflow `.github/workflows/pages.yml` roda o validador e, a cada push na `mai
 
 ## Progresso e privacidade
 
-O progresso (`rpg_mundos_prog`) e os nomes escolhidos (`rpg_nomes`) ficam apenas no `localStorage` do navegador do jogador. Nada é enviado para nenhum servidor e não há requisições a serviços externos.
+O progresso (`rpg_mundos_prog`) os nomes escolhidos (`rpg_nomes`) e a escolha do dado (`rpg_dado`) ficam apenas no `localStorage` do navegador do jogador. Nada é enviado para nenhum servidor e não há requisições a serviços externos.
 
 ## Licença
 

@@ -28,6 +28,7 @@ galaxia-aventura/
         ├── reino-cenas.js       # Mundo 1: heróis (HEROES), SLIP e cenas dos caps. 1–4
         ├── engine.js            # tabela CH, estado, dado, batalhas, mapas, galáxia, progresso
         ├── nomes.js             # nomes personalizáveis dos heróis
+        ├── dado.js              # opção de dado de verdade
         ├── pwa.js               # registra o service worker
         └── mundos/
             ├── reino-cap5-10.js     # Mundo 1: capítulos 5 a 10
@@ -110,9 +111,17 @@ Na galáxia, o botão **✏️ Personalizar nomes** abre um formulário com os s
 - Para tornar outro personagem personalizável, inclua-o em `SLOTS`. Os testes de `nomes()` ficam em `tools/validar.js`.
 - Salvo em `localStorage`, chave `rpg_nomes`.
 
+## Dado de verdade (opcional)
+
+Na mesma tela de personalizar, a família escolhe **Dado do jogo (na tela)** ou **Meu dado de verdade**.
+
+- Todo lançamento (testes, batalhas e colheita de frutinhas) passa por `roll(cb, dica)` em `engine.js`. No modo físico, `roll()` chama `pedirDado()` (`js/dado.js`), que abre uma janela com as 6 faces do dado desenhadas em bolinhas. A criança toca na face que saiu e confirma; o resultado entra como se fosse o digital.
+- A janela mostra uma dica do que cada resultado significa e tem "Cancelar". Também aceita teclado (1 a 6, Enter, Esc).
+- O padrão é o dado digital. A escolha fica em `localStorage`, chave `rpg_dado`.
+
 ## Persistência
 
-Progresso salvo em `localStorage` na chave `rpg_mundos_prog` (os nomes escolhidos ficam em `rpg_nomes`), separado por mundo (`reino`, `florescer`...). Há migração automática da chave antiga `rpg_bilu_prog` para o Mundo 1. Também existe uma opção discreta de ajuste de progresso (pular para um capítulo) e de reiniciar o progresso.
+Progresso salvo em `localStorage` na chave `rpg_mundos_prog` (os nomes escolhidos ficam em `rpg_nomes` e o tipo de dado em `rpg_dado`), separado por mundo (`reino`, `florescer`...). Há migração automática da chave antiga `rpg_bilu_prog` para o Mundo 1. Também existe uma opção discreta de ajuste de progresso (pular para um capítulo) e de reiniciar o progresso.
 
 ## Como estender
 

@@ -25,7 +25,7 @@ function recRoll(){
  roll(v=>{const g=v<=2?1:v<=4?2:3;S.hearts=Math.min(S.max,S.hearts+g);
   const fr=['🍓','🍇','🍒','🍎'][v%4];
   S.rec.msg=`🎲 Tirou ${v}! Colheram ${fr.repeat(g)} e ganharam ${g} ❤️!`+(S.hearts>=S.max?'\n\nTodos estão com FORÇA TOTAL! 💪\nA Vovó Coruja deu um abraço em cada um e disse:\n"Agora vocês conseguem!" 🦉':'\n\nAinda estão cansadinhos... Vamos colher mais frutinhas!');
-  render()});
+  render()},'1-2: 1 ❤️ · 3-4: 2 ❤️ · 5-6: 3 ❤️');
 }
 const heroes=()=>[...HEROES,...CH[S.ch].heroes];
 
@@ -70,7 +70,8 @@ function go(id){
 const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 function dieHTML(v){return `<div class="die" id="die">${[...Array(9)].map((_,i)=>`<div class="pip ${PIPS[v].includes(i)?'on':''}"></div>`).join('')}</div>`}
 function setDie(v){$('die').querySelectorAll('.pip').forEach((p,i)=>p.classList.toggle('on',PIPS[v].includes(i)))}
-function roll(cb){
+function roll(cb,dica){
+ if(dadoFisico()){pedirDado(cb,dica);return}
  busy=1;document.querySelectorAll('button').forEach(b=>b.disabled=true);
  const el=$('die');el.classList.remove('roll');void el.offsetWidth;el.classList.add('roll');
  let n=0;const it=setInterval(()=>{setDie(d6());if(++n>=10){clearInterval(it);const v=d6();setDie(v);S.die=v;setTimeout(()=>{busy=0;cb(v)},350)}},85);
@@ -247,7 +248,7 @@ function worldsHTML(){
  let h=`<div class="maptop"><div class="title">🌌 Galáxia das Aventuras</div><div class="mapsub">Toque num planeta para escolher o mundo</div></div><div class="split"><div class="pmap"><div class="wwrap">${s}</div></div><div class="pside">`;
  if(window._ed)h+=editorNomesHTML();
  else if(WORLDS[sel]){const W=WORLDS[sel],pr=ALLPROG[sel]||{},base=Object.keys(W.chapters).filter(n=>!W.chapters[n].special),d=base.filter(n=>pr[n]).length;
-  h+=`<div class="lvcard"><div class="lvn">Planeta</div><div class="lvt">${W.icon} ${W.name}</div><div class="lvs">${W.desc}</div><div class="wheroes">${W.heroes.map(x=>faceDe(x)).join(' ')}</div><div class="lvs">⭐ ${d} de ${base.length} fases${d===base.length?' · 🏆':''}</div><button class="btn go" onclick="enterWorld('${sel}');go('menu')">🚀 Viajar para este mundo!</button></div><button class="btn reset" onclick="abrirNomes()">✏️ Personalizar nomes</button>`}
+  h+=`<div class="lvcard"><div class="lvn">Planeta</div><div class="lvt">${W.icon} ${W.name}</div><div class="lvs">${W.desc}</div><div class="wheroes">${W.heroes.map(x=>faceDe(x)).join(' ')}</div><div class="lvs">⭐ ${d} de ${base.length} fases${d===base.length?' · 🏆':''}</div><button class="btn go" onclick="enterWorld('${sel}');go('menu')">🚀 Viajar para este mundo!</button></div><button class="btn reset" onclick="abrirNomes()">✏️ Personalizar nomes e dado</button>`}
  else h+=`<div class="lvcard"><div class="lvn">Planeta misterioso</div><div class="lvt">❓ Em breve</div><div class="lvs">Um novo mundo, com novos heróis e aventuras, está sendo criado...</div></div>`;
  h+=`</div></div>`;
  return h;
@@ -315,7 +316,7 @@ function test(){
  roll(v=>{const ok=v>=T.need;
   if(!ok&&!S.retried){S.retried=1;S.t={v,retry:1};render();return}
   const o=ok?T.ok:T.fail;let extra=o.fx?o.fx():'';
-  S.t={v,ok,text:(ok&&S.retried?'Na segunda tentativa deu certo! 💪\n':'')+o.text+(extra?`\n<b>${extra.trim()}</b>`:''),go:o.go||T.next};render()});
+  S.t={v,ok,text:(ok&&S.retried?'Na segunda tentativa deu certo! 💪\n':'')+o.text+(extra?`\n<b>${extra.trim()}</b>`:''),go:o.go||T.next};render()},'Precisa tirar '+T.need+' ou mais');
 }
 function buzio(){
  const B=SC[S.scene].battle,b=S.b;S.f.buzioUsado=1;b.hp=Math.max(0,b.hp-2);
@@ -333,7 +334,7 @@ function attack(i){
   if(b.hp<=0){b.hp=0;b.done=1;m+=`\n\n🏆 ${B.win}`}
   b.msg=m;render();
   if(r>2){const f=$('ef');f.classList.add('hit')}
- });
+ },'1-2: errou · 3-4: acertou · 5-6: SUPER ataque!');
 }
 function speak(){
  try{const t=$('narr').innerText.replace(/\p{Extended_Pictographic}|️|‍/gu,'');

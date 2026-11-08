@@ -143,6 +143,13 @@ if (typeof get('nomes') === 'function') {
   for (const s of get('SLOTS')) for (const g of ['M', 'F']) if (!s.faces[g]) erro(`SLOTS: "${s.id}" sem rosto para o gênero ${g}`);
 }
 
+/* ---------- 4c. dado de verdade (dado.js) ---------- */
+if (typeof get('dadoFisico') === 'function') {
+  if (get('dadoFisico()') !== false) erro('dadoFisico(): o padrão deve ser o dado digital');
+  const pips = get('DADO_PIPS');
+  for (let v = 1; v <= 6; v++) if (!pips[v] || pips[v].length !== v) erro(`DADO_PIPS: a face ${v} deve ter ${v} bolinhas`);
+} else erro('dado.js: função dadoFisico() não encontrada');
+
 /* ---------- 5. arquivos do modo offline (sw.js) ---------- */
 const sw = fs.readFileSync(path.join(RAIZ, 'sw.js'), 'utf8');
 const lista = [...(sw.match(/ARQUIVOS\s*=\s*\[([\s\S]*?)\]/) || [, ''])[1].matchAll(/'([^']+)'/g)].map(m => m[1]);

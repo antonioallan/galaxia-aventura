@@ -80,7 +80,18 @@ function roll(cb,dica){
 function hud(){
  const h='❤️'.repeat(S.hearts)+'🤍'.repeat(Math.max(0,S.max-S.hearts));
  const bag=[S.f.cenoura&&!S.f.cenouraUsada?'🥕 Cenoura Mágica':'',S.f.concha?'🐚 Concha de Luz':'',S.f.po&&!S.f.poUsado?'🌟 Pó de Estrela':'',S.f.vaga?'✨ Vaga-lumes':'',S.f.buzio&&!S.f.buzioUsado?'🐚 Búzio Mágico':'',WORLD==='reino'&&S.ch===4?`⚡ Cristais ${S.f.cristais||0}/3`:'',S.f.chave?'🪛 Chave Dourada':'',...Object.keys(S.inv).filter(k=>S.inv[k]===1).map(k=>ITEMS[k].name),S.cnt?`${S.cnt.icon} ${S.cnt.n}/${S.cnt.of}`:''].filter(Boolean).join(' · ');
- return `<div class="hud"><span class="hearts">${h}</span><span>⭐ ${S.stars} · 🧚 ${3-S.fadas}</span></div><div class="bag">${bag?'Mochila: '+bag:''}</div>`;
+ const B=SC[S.scene].battle,mini=B&&S.b?`<div class="mini" id="mini"><span>${B.face} ${B.name}</span><span>${'💜'.repeat(S.b.hp)}${'🤍'.repeat(Math.max(0,B.hp-S.b.hp))}</span></div>`:'';
+ return `<div class="hudfix"><div class="hud"><span class="hearts">${h}</span><span>⭐ ${S.stars} · 🧚 ${3-S.fadas}</span></div>${mini}</div><div class="bag">${bag?'Mochila: '+bag:''}</div>`;
+}
+/* corações da equipe ficam fixos no topo (.hudfix); a barra do inimigo (#mini) só aparece quando o cartão dele saiu da tela */
+let _vigia=null;
+function vigiaInimigo(){
+ if(_vigia){_vigia.disconnect();_vigia=null}
+ const m=$('mini'),e=document.querySelector('.enemy');
+ if(!m||!e)return;
+ if(!window.IntersectionObserver){m.classList.add('on');return}
+ _vigia=new IntersectionObserver(([x])=>m.classList.toggle('on',!x.isIntersecting),{rootMargin:'-110px 0px 0px 0px'});
+ _vigia.observe(e);
 }
 function tools(){return `<div class="tools"><button onclick="speak()">🔊 Ler em voz alta</button><button onclick="if(window._c){reset()}else{window._c=1;this.textContent='Toque de novo p/ recomeçar';setTimeout(()=>window._c=0,2500)}">🔄 Recomeçar</button></div><div class="tools">${botaoSom()}</div>`}
 function txt(t){return typeof t==='function'?t():t}
@@ -313,6 +324,7 @@ function render(){
   } else sc.choices.forEach((c,i)=>{if(c[2]&&!amigo(c[2]))return;h+=`<button class="btn ${i?'b2':''}" onclick="choose(${i})">${c[0]}</button>`});
  }
  $('app').innerHTML=nomes(h+tools());
+ vigiaInimigo();
 }
 function choose(i){tocar('ok');go(SC[S.scene].choices[i][1])}
 function test(){

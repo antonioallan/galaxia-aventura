@@ -183,3 +183,8 @@ body{margin:0;font-family:'Baloo 2',system-ui,sans-serif;background:linear-gradi
 @keyframes brilho{to{left:140%}}
 @media (min-width:900px){.alb{max-width:760px}.albgrade{grid-template-columns:repeat(4,1fr)}}
 @media (prefers-reduced-motion:reduce){.pula,.enemy .face.amigo,.enemy .face.amigo::after,.hearts.ai,.rank,.figcard.nova,.figcard.nova::after{animation:none}}
+/* ===== Corações sempre visíveis ===== */
+.hudfix{position:sticky;top:0;z-index:20;margin:-14px -14px 0;padding:10px 14px 6px;background:linear-gradient(180deg,#ffe9f3 75%,#ffe9f300)}
+.mini{display:none;justify-content:space-between;align-items:center;background:#fff;border-radius:14px;margin-top:6px;padding:4px 14px;box-shadow:0 3px 0 #0001;font-size:18px;font-weight:700}
+.mini.on{display:flex}
+@media (min-width:900px){.hudfix{margin:-24px -14px 0;padding-top:24px}}

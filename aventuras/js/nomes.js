@@ -9,7 +9,10 @@ const SLOTS=[
  {id:'kay',orig:'Kay',faces:{M:'🧒',F:'👧'},g:'M',mundo:'Reino das Cores'},
  {id:'liv',orig:'Liv',faces:{M:'🦸‍♂️',F:'🦸‍♀️'},g:'F',mundo:'Planeta Florescer'},
  {id:'lia',orig:'Lia',faces:{M:'👶',F:'👶'},g:'F',mundo:'Planeta Florescer'},
- {id:'bolota',orig:'Bolota',faces:{M:'🐿️',F:'🐿️'},g:'F',mundo:'Planeta Florescer'}];
+ {id:'bolota',orig:'Bolota',faces:{M:'🐿️',F:'🐿️'},g:'F',mundo:'Planeta Florescer'},
+ {id:'gominha',orig:'Gominha',faces:{M:'🐙',F:'🐙'},g:'M',mundo:'Planeta Monstrinhos'},
+ {id:'pedregulho',orig:'Pedregulho',faces:{M:'🪨',F:'🪨'},g:'M',mundo:'Planeta Monstrinhos'},
+ {id:'baiacao',orig:'Baiacão',faces:{M:'🐡',F:'🐡'},g:'M',mundo:'Planeta Monstrinhos'}];
 
 /* artigos que mudam com o gênero: "o Kay" ↔ "a Maria", "do Kay" ↔ "da Maria"... */
 const ART_MF={o:'a',O:'A',do:'da',Do:'Da',no:'na',No:'Na',ao:'à',Ao:'À',pelo:'pela',Pelo:'Pela',um:'uma',Um:'Uma'};

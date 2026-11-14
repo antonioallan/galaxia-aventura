@@ -6,6 +6,9 @@
 const FIGURAS={
  faisca:['🐲','reino'],bruxa:['🧙‍♀️','reino'],pirata:['🏴‍☠️','reino'],robo:['🤖','reino'],magico:['🎩','reino'],
  boneco:['⛄','reino'],arrumadinho:['🧺','reino'],bocejo:['💭','reino'],rei:['👑','reino'],formiga:['🐜','reino'],borracha:['✏️','reino'],
+ pinchao:['🦔','monstrinhos'],cochichona:['🦉','monstrinhos'],pincolino:['🦀','monstrinhos'],cavoucao:['🦫','monstrinhos'],
+ calorao:['🦎','monstrinhos'],friozao:['🦣','monstrinhos'],bisbilhotao:['👀','monstrinhos'],vovomonstrona:['🦕','monstrinhos'],
+ cometa:['☄️','florescer'],nevoinha:['🌫️','florescer'],
  brilho:['🐦','florescer'],lesma:['🐌','florescer'],flamingo:['🦩','florescer'],escorpiao:['🦂','florescer'],tigre:['🐯','florescer'],
  pavao:['🦚','florescer'],espelhinho:['🪞','florescer'],borboleta:['🦋','florescer'],tico:['🦊','florescer'],trovao:['🌩️','florescer']
 };

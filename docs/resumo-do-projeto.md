@@ -77,7 +77,10 @@ Heróis: **Liv**, **Lia** e **Bolota** 🐿️. Jornada linear em busca das 9 Fo
 | 8 | A Horta Gigante |
 | 9 | O Monte Oco |
 | 10 | A Festa das Lanternas (companheiro: Tico 🦊) |
-| 11–12 | Capítulos extras "em breve" (reservados) |
+| 11 *(especial)* | Tico, Trovãozinho e as Três Estrelinhas (amigo: Cometinha ☄️) |
+| 12 *(especial)* | Os Monstrinhos Chegaram! Crossover com o Planeta Monstrinhos (amiga: Nevoinha 🌫️) |
+
+Os capítulos 11 e 12 estão em `js/mundos/florescer-especiais.js` e só aparecem no mapa depois de concluir o capítulo 10. O 11 é um spin-off com coadjuvantes (contador de 3 estrelinhas); o 12 traz Gominha, Pedregulho e Baiacão como heróis extras (contador de 3 lugares sem medo) e, no final, cita os amigos que a criança fez no Planeta Monstrinhos (`figuraGanha()`).
 
 A galáxia também exibe um planeta misterioso "Em breve", indicando espaço para novos mundos.
 

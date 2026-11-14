@@ -242,7 +242,7 @@ function planetSVG(id,P,sel){
  g+=`<text x="${x}" y="${y+r+(P.ring?30:24)}" font-size="15" font-weight="800" fill="#fff" text-anchor="middle" style="paint-order:stroke" stroke="#1a1446" stroke-width="4">${P.label}</text>`;
  return `<g class="lv" onclick="selWorld('${id}')">${g}</g>`;
 }
-const MYSTERY=[{x:322,y:390,r:42,sea:'#9a8fb5',dark:'#4b3f6b',ring:['#ffffff55'],craters:[[.3,-.3,.2],[-.35,.2,.16]],mystery:1,label:'Em breve'},
+const MYSTERY=[
  {x:78,y:470,r:28,sea:'#8a9aa8',dark:'#45566a',craters:[[.2,.2,.25]],mystery:1,label:'Em breve'}];
 function selWorld(w){window._wsel=w;render()}
 function worldsHTML(){

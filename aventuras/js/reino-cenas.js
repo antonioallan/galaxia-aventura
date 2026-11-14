@@ -278,7 +278,8 @@ const SC={
   win:'O Monstro Geleca era só um filhotinho! Ele deu um abraço grudento e mostrou o caminho. 🟢🤗',next:'c4_lua_lata'}},
 
  c4_lua_lata:{art:'🌑⚙️🤖🤖',text:'Chegaram na Lua de Lata! Tudo é feito de parafusos e engrenagens. ⚙️\n\nNa porta da base tem dois Robôs Guardas:\n"BIP! Quem são vocês? BOP!"\n\nO que vocês fazem?',
-  choices:[['⚔️ Batalhar com os guardas','c4_guardas'],['🕺 Fazer a dança do robô','c4_danca_robo']]},
+  choices:[['⚔️ Batalhar com os guardas','c4_guardas'],['🕺 Fazer a dança do robô','c4_danca_robo'],['🔑 Montar a chave da porta secreta','c4_porta_chave']]},
+ c4_porta_chave:{mini:{tipo:'quebra',emoji:'🔑',cols:2,rows:2,art:'🚪🔒⚙️',text:'Vocês encontraram uma PORTA SECRETA na lateral da base! 🚪\n\nA fechadura tem formato de CHAVE, mas a chave gigante está em pedaços bagunçados! 🧩\n\nMonte a chave para abrir a porta!',ok:'CLIC! A chave se encaixou e a porta secreta abriu devagarinho... 🔑🚪✨\n\nVocês entraram na base sem fazer nenhum barulho!',next:'c4_base',fx(){return star()}}},
  c4_danca_robo:{test:{art:'🕺🤖',text:'(Hora de fazer a dança do robô de verdade! Braços duros, BIP BOP! 🤖)\n\nOs guardas olham com atenção...\n\nPrecisa tirar 4 ou mais.',need:4,
   ok:{text:'Os guardas acharam que vocês eram robôs e começaram a dançar junto! 🤖🕺\nVocês entraram dançando!',fx(){return star()},go:'c4_base'},
   fail:{text:'"BIP! Robô não ri assim!" 😂\nOs guardas descobriram vocês!',go:'c4_guardas'}}},

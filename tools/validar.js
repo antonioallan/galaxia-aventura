@@ -52,16 +52,25 @@ function saidas(id) {
   }
   if (s.test) { add(s.test.next, 'test.next'); add(s.test.ok && s.test.ok.go, 'test.ok.go'); add(s.test.fail && s.test.fail.go, 'test.fail.go'); }
   if (s.battle) add(s.battle.next, 'battle.next');
+  if (s.mini) add(s.mini.next, 'mini.next');
   return alvos;
 }
 const ehFim = id => !!SC[id].end;
-const semSaida = id => { const s = SC[id]; return !s.end && !s.menu && !s.mundos && !s.album && !s.rec && !(s.choices && s.choices.length) && !s.test && !s.battle; };
+const semSaida = id => { const s = SC[id]; return !s.end && !s.menu && !s.mundos && !s.album && !s.rec && !(s.choices && s.choices.length) && !s.test && !s.battle && !s.mini; };
 
 let dinamicos = 0;
 for (const id of Object.keys(SC)) {
   const s = SC[id];
   if (semSaida(id)) erro(`cena "${id}" não é fim e não tem saída`);
   if (s.test && typeof s.test.need !== 'number') erro(`cena "${id}": teste sem "need" numérico`);
+  if (s.mini) {
+    const m = s.mini, t = m.tipo;
+    if (!['quebra', 'pares', 'sequencia'].includes(t)) erro(`cena "${id}": mini-jogo de tipo "${t}" não existe`);
+    if (!(m.text && m.ok && m.art)) erro(`cena "${id}": mini-jogo precisa de art, text e ok`);
+    if (t === 'quebra' && !(m.emoji && m.cols >= 1 && m.rows >= 1 && m.cols * m.rows >= 2 && m.cols * m.rows <= 12)) erro(`cena "${id}": quebra-cabeça precisa de emoji e cols x rows entre 2 e 12 peças`);
+    if (t === 'pares' && !(Array.isArray(m.emojis) && m.emojis.length >= 2 && m.emojis.length <= 8 && new Set(m.emojis).size === m.emojis.length)) erro(`cena "${id}": pares precisa de 2 a 8 emojis diferentes`);
+    if (t === 'sequencia' && m.len !== undefined && !(m.len >= 2 && m.len <= 8)) erro(`cena "${id}": sequencia precisa de len entre 2 e 8`);
+  }
   if (s.battle && !(s.battle.hp > 0)) erro(`cena "${id}": batalha sem "hp" positivo`);
   if (s.battle && !(Array.isArray(s.battle.counter) && s.battle.counter.length)) erro(`cena "${id}": batalha sem frases de contra-ataque`);
   for (const [alvo, onde] of saidas(id)) {

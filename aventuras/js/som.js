@@ -46,11 +46,13 @@ const SONS={
  figurinha(ac){[0,1,2,3,4].forEach(i=>_nota(ac,_N.mi2+i*180,i*.07,.25,'sine',.09))},
  /* coração perdido / cura */
  ai(ac){_nota(ac,400,0,.25,'sine',.12,160)},
+ /* botões coloridos do mini-jogo de sequência: i = 0..3 */
+ pad(ac,i){_nota(ac,[330,392,494,587][i||0],0,.38,'triangle',.18)},
  cura(ac){_nota(ac,_N.do,0,.12,'sine',.12);_nota(ac,_N.mi,.1,.12,'sine',.12);_nota(ac,_N.sol,.2,.2,'sine',.12)}
 };
-function tocar(nome){
+function tocar(nome,arg){
  if(!somLigado())return;
  try{const ac=_audio();if(!ac||!SONS[nome])return;
   if(ac.state==='suspended')ac.resume();
-  SONS[nome](ac)}catch(e){}
+  SONS[nome](ac,arg)}catch(e){}
 }

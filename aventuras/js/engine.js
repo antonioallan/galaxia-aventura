@@ -61,9 +61,10 @@ function count(){S.cnt.n++;return ` (+1 ${S.cnt.icon}: ${S.cnt.n} de ${S.cnt.of}
 function reset(){newGame(1);go('menu')}
 function go(id){
  if(typeof id==='function')id=id();
- S.scene=id;S.extra='';S.t=null;S.retried=0;S.festou=0;
+ S.scene=id;S.extra='';S.t=null;S.retried=0;S.festou=0;S.mj=null;
  const sc=SC[id];
  if(sc.enter)S.extra=sc.enter();
+ if(sc.mini)S.mj=miniNovo(sc.mini);
  if(sc.battle)S.b={hp:sc.battle.hp,msg:(S.rematch?'💪 Os heróis voltaram descansados! Hora da REVANCHE!\n\n':'')+sc.battle.intro,done:0,bonus:0};
  S.rematch=0;
  render();window.scrollTo(0,sc.menu?Math.max(0,(window._mapY||0)-220):0);
@@ -297,6 +298,11 @@ function render(){
   if(S.t&&S.t.retry){h+=`<div class="story" id="narr"><b class="bad">🎲 Tirou ${S.t.v}... Quase! 😮</b>\n\nNão desiste! Vocês têm mais uma chance!\nPrecisa tirar ${T.need} ou mais. 💪</div>${dieHTML(S.die)}<button class="btn" onclick="test()">🎲 Tentar mais uma vez!</button>`}
   else if(!S.t){h+=`<div class="story" id="narr">${T.text}</div>${dieHTML(S.die)}<button class="btn" onclick="test()">🎲 Rolar o dado!</button>`}
   else{const r=S.t;h+=`<div class="story" id="narr"><b class="${r.ok?'good':'bad'}">🎲 Tirou ${r.v}! ${r.ok?'Conseguiu! 🎉':'Ihhh, não deu... 😅'}</b>\n\n${r.text}</div>${dieHTML(S.die)}<button class="btn go" onclick="cont('${r.go}')">${S.down?'😴 Ir descansar na cabana ➜':'Continuar ➜'}</button>`}
+ } else if(sc.mini){
+  const m=sc.mini,J=S.mj;
+  h+=`<div class="art">${m.art}</div>${m.title?`<div class="title">${m.title}</div>`:''}`;
+  if(J.done)h+=`<div class="story" id="narr">${J.ajudou?'🧚 A Fada Luzinha deu uma forcinha!\n\n':''}${m.ok}${J.extra?`\n\n<b class="good">${J.extra.trim()}</b>`:''}</div><button class="btn go" onclick="go('${m.next}')">Continuar ➜</button>`;
+  else h+=`<div class="story" id="narr">${m.text}</div><div id="mj" class="mj">${miniHTML()}</div>`;
  } else if(sc.rec){
   const full=S.hearts>=S.max;
   h+=`<div class="art">🏡🦉🍓</div><div class="title">Cabana da Vovó Coruja</div><div class="story" id="narr">${S.rec.msg||'Os heróis estavam muito cansados... 😴\nA Vovó Coruja 🦉 levou todo mundo para a cabana dela.\n\n"Descansem e comam frutinhas mágicas para ficar fortes!"\n\n(Hora de beber água e se espreguiçar de verdade! 🥤🙆)\n\nRole o dado para colher frutinhas:\n1-2 = 1 ❤️ · 3-4 = 2 ❤️ · 5-6 = 3 ❤️'}</div>${dieHTML(S.die)}`;

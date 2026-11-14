@@ -55,7 +55,7 @@ function saidas(id) {
   return alvos;
 }
 const ehFim = id => !!SC[id].end;
-const semSaida = id => { const s = SC[id]; return !s.end && !s.menu && !s.mundos && !s.rec && !(s.choices && s.choices.length) && !s.test && !s.battle; };
+const semSaida = id => { const s = SC[id]; return !s.end && !s.menu && !s.mundos && !s.album && !s.rec && !(s.choices && s.choices.length) && !s.test && !s.battle; };
 
 let dinamicos = 0;
 for (const id of Object.keys(SC)) {
@@ -106,7 +106,7 @@ for (const [wid, W] of Object.entries(WORLDS)) {
   const usados = Object.values(nodes);
   if (new Set(usados).size !== usados.length) erro(`mundo "${wid}": dois capítulos usam a mesma posição no mapa`);
 }
-const orfas = Object.keys(SC).filter(id => !visitadas.has(id) && !SC[id].menu && !SC[id].mundos && !SC[id].rec);
+const orfas = Object.keys(SC).filter(id => !visitadas.has(id) && !SC[id].menu && !SC[id].mundos && !SC[id].album && !SC[id].rec);
 if (orfas.length) aviso(`${orfas.length} cena(s) nunca alcançadas por nenhum capítulo: ${orfas.join(', ')}`);
 
 /* ---------- 4. itens e amizades citados no código ---------- */
@@ -149,6 +149,24 @@ if (typeof get('dadoFisico') === 'function') {
   const pips = get('DADO_PIPS');
   for (let v = 1; v <= 6; v++) if (!pips[v] || pips[v].length !== v) erro(`DADO_PIPS: a face ${v} deve ter ${v} bolinhas`);
 } else erro('dado.js: função dadoFisico() não encontrada');
+
+/* ---------- 4d. álbum de amigos (album.js) e sons (som.js) ---------- */
+if (typeof get('albumHTML') === 'function') {
+  const FIG = get('FIGURAS');
+  for (const k of Object.keys(FRIEND)) {
+    if (!FIG[k]) erro(`álbum: amigo "${k}" não tem figurinha em FIGURAS (album.js)`);
+    else if (!WORLDS[FIG[k][1]]) erro(`álbum: figurinha "${k}" aponta para o mundo "${FIG[k][1]}", que não existe`);
+  }
+  for (const k of Object.keys(FIG)) if (!FRIEND[k]) erro(`álbum: FIGURAS tem "${k}", que não existe em FRIEND`);
+  const ganha = get('figuraGanha');
+  const prog = { 1: { done: 1, stars: 3 }, 2: { done: 1, stars: 0, skip: 1 }, 3: { done: 1, stars: 2 }, lost: { pirata: 1 } };
+  if (!ganha('faisca', prog)) erro('álbum: amigo de capítulo concluído deve estar no álbum');
+  if (ganha('bruxa', prog)) erro('álbum: capítulo marcado como "já jogamos" (skip) não deve dar figurinha');
+  if (ganha('pirata', prog)) erro('álbum: amigo perdido não deve estar no álbum');
+  if (ganha('robo', prog)) erro('álbum: amigo de capítulo não jogado não deve estar no álbum');
+} else erro('album.js: função albumHTML() não encontrada');
+if (typeof get('tocar') !== 'function') erro('som.js: função tocar() não encontrada');
+else { try { get("tocar('dado')"); get("tocar('inexistente')"); } catch (e) { erro(`som.js: tocar() não pode falhar sem áudio (${e.message})`); } }
 
 /* ---------- 5. arquivos do modo offline (sw.js) ---------- */
 const sw = fs.readFileSync(path.join(RAIZ, 'sw.js'), 'utf8');

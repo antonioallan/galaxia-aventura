@@ -8,13 +8,14 @@ let CH={
 /* Itens genéricos (capítulos 5+): bonus = soma no dado, heal = corações, dmg = tira energia, shield = protege do próximo erro */
 const ITEMS={};
 function give(k){S.inv[k]=1;return ` (ganhou: ${ITEMS[k].name}!)`}
+function vence(){const f=$('ef');if(f){f.classList.add('amigo');pula(f)}festaBatalha()}
 function useItem(k){
  const it=ITEMS[k],B=SC[S.scene].battle,b=S.b;S.inv[k]=2;
  if(it.type==='bonus'){b.bonus=it.v;b.msg=`${it.name} pronto! +${it.v} no próximo dado! ✨`}
  else if(it.type==='heal'){S.hearts=Math.min(S.max,S.hearts+it.v);b.msg=`${it.name}: vocês ganharam ${it.v} ❤️! 💖`}
  else if(it.type==='shield'){b.shield=1;b.msg=`${it.name} ativado! Se alguém errar, ninguém se machuca! 🛡️`}
  else if(it.type==='dmg'){b.hp=Math.max(0,b.hp-it.v);b.msg=`${it.name}: ${it.fx||'POW!'} 💥`;if(b.hp<=0){b.done=1;b.msg+=`\n\n🏆 ${B.win}`}}
- render();if(it.type==='dmg')$('ef').classList.add('hit');
+ render();if(it.type==='dmg'){$('ef').classList.add('hit');tocar('bom');if(S.b.done)vence()}else tocar(it.type==='heal'?'cura':'ok');
 }
 function cristal(){S.f.cristais=(S.f.cristais||0)+1;return ` (+1 ⚡ Cristal: ${S.f.cristais} de 3)`}
 function recover(back){S.rec={back,msg:''};go('recupera')}
@@ -60,7 +61,7 @@ function count(){S.cnt.n++;return ` (+1 ${S.cnt.icon}: ${S.cnt.n} de ${S.cnt.of}
 function reset(){newGame(1);go('menu')}
 function go(id){
  if(typeof id==='function')id=id();
- S.scene=id;S.extra='';S.t=null;S.retried=0;
+ S.scene=id;S.extra='';S.t=null;S.retried=0;S.festou=0;
  const sc=SC[id];
  if(sc.enter)S.extra=sc.enter();
  if(sc.battle)S.b={hp:sc.battle.hp,msg:(S.rematch?'💪 Os heróis voltaram descansados! Hora da REVANCHE!\n\n':'')+sc.battle.intro,done:0,bonus:0};
@@ -72,7 +73,7 @@ function dieHTML(v){return `<div class="die" id="die">${[...Array(9)].map((_,i)=
 function setDie(v){$('die').querySelectorAll('.pip').forEach((p,i)=>p.classList.toggle('on',PIPS[v].includes(i)))}
 function roll(cb,dica){
  if(dadoFisico()){pedirDado(cb,dica);return}
- busy=1;document.querySelectorAll('button').forEach(b=>b.disabled=true);
+ busy=1;document.querySelectorAll('button').forEach(b=>b.disabled=true);tocar('dado');
  const el=$('die');el.classList.remove('roll');void el.offsetWidth;el.classList.add('roll');
  let n=0;const it=setInterval(()=>{setDie(d6());if(++n>=10){clearInterval(it);const v=d6();setDie(v);S.die=v;setTimeout(()=>{busy=0;cb(v)},350)}},85);
 }
@@ -81,7 +82,7 @@ function hud(){
  const bag=[S.f.cenoura&&!S.f.cenouraUsada?'🥕 Cenoura Mágica':'',S.f.concha?'🐚 Concha de Luz':'',S.f.po&&!S.f.poUsado?'🌟 Pó de Estrela':'',S.f.vaga?'✨ Vaga-lumes':'',S.f.buzio&&!S.f.buzioUsado?'🐚 Búzio Mágico':'',WORLD==='reino'&&S.ch===4?`⚡ Cristais ${S.f.cristais||0}/3`:'',S.f.chave?'🪛 Chave Dourada':'',...Object.keys(S.inv).filter(k=>S.inv[k]===1).map(k=>ITEMS[k].name),S.cnt?`${S.cnt.icon} ${S.cnt.n}/${S.cnt.of}`:''].filter(Boolean).join(' · ');
  return `<div class="hud"><span class="hearts">${h}</span><span>⭐ ${S.stars} · 🧚 ${3-S.fadas}</span></div><div class="bag">${bag?'Mochila: '+bag:''}</div>`;
 }
-function tools(){return `<div class="tools"><button onclick="speak()">🔊 Ler em voz alta</button><button onclick="if(window._c){reset()}else{window._c=1;this.textContent='Toque de novo p/ recomeçar';setTimeout(()=>window._c=0,2500)}">🔄 Recomeçar</button></div>`}
+function tools(){return `<div class="tools"><button onclick="speak()">🔊 Ler em voz alta</button><button onclick="if(window._c){reset()}else{window._c=1;this.textContent='Toque de novo p/ recomeçar';setTimeout(()=>window._c=0,2500)}">🔄 Recomeçar</button></div><div class="tools">${botaoSom()}</div>`}
 function txt(t){return typeof t==='function'?t():t}
 
 /* ===== Progresso e mapa das fases ===== */
@@ -197,14 +198,14 @@ function mapHTML(){
  let h=`<div class="maptop"><button class="back" onclick="go('mundos')">⬅ Mundos</button><div class="title">${WORLDS[WORLD].icon} ${WORLDS[WORLD].name}</div><div class="mapsub">⭐ ${doneN} de ${ids.length} fases concluídas</div>${extra&&!PROG[11]&&!PROG[12]?'<div class="unlock">✨ Novos capítulos especiais desbloqueados! ✨</div>':''}</div>`;
  h+=`<div class="split"><div class="pmap"><div class="wwrap">${s}</div></div><div class="pside">`;
  h+=`<div class="lvcard"><div class="lvn">${CH[sel].special?'✨ Capítulo especial '+sel:'Fase '+sel}</div><div class="lvt">${ICON[sel]} ${CH[sel].title}</div>${(()=>{if(CH[sel].soon)return `<div class="lvs">✨ Em breve</div><div class="fbox">Um capítulo extra vai chegar aqui! Novas aventuras estão sendo preparadas...</div>`;const L=lockInfo(sel);return L?`<div class="lvs">🔒 Fase bloqueada</div><div class="fbox sad">Para jogar esta fase, ${L.txt} precisa ser amigo da equipe. Jogue o Capítulo ${L.ch} de novo e escolha o final feliz!</div><button class="btn" onclick="startCh(${L.ch})">▶ Jogar o Capítulo ${L.ch}</button>`:`<div class="lvs">${p?(p.stars?`⭐ Concluída com ${p.stars} estrelas`:'✓ Concluída'):'Ainda não jogada'}</div><button class="btn go" onclick="startCh(${sel})">▶ Jogar!</button>`})()}<div class="lvhint">Toque numa fase do mapa para escolher</div></div>`;
- h+=`<button class="btn reset" onclick="resetProg(this)">🔄 Reiniciar fases</button>`;
+ h+=`<button class="btn reset" onclick="abrirAlbum()">📒 Álbum de amigos</button><button class="btn reset" onclick="resetProg(this)">🔄 Reiniciar fases</button>`;
  h+=`<div class="adj"><button class="adjlink" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">⚙️ já jogamos algumas fases</button><div hidden class="adjbox">Em qual fase vocês estão?<br><small>As fases antes dela ficam marcadas como concluídas.</small><div class="adjgrid">${ids.map(n=>`<button onclick="startFrom(${n})">${n}</button>`).join('')}</div></div></div>`;
  h+=`</div></div>`;
  window._mapY=0;
  return h;
 }
 function selCh(n){window._sel=n;render()}
-SC.mundos={mundos:1};
+SC.mundos={mundos:1};SC.album={album:1};
 function planetSVG(id,P,sel){
  const {x,y,r}=P;let g='';
  g+=`<defs><radialGradient id="pg_${id}" cx="34%" cy="28%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".3" stop-color="${P.sea}"/><stop offset="1" stop-color="${P.dark}"/></radialGradient>
@@ -248,16 +249,17 @@ function worldsHTML(){
  let h=`<div class="maptop"><div class="title">🌌 Galáxia das Aventuras</div><div class="mapsub">Toque num planeta para escolher o mundo</div></div><div class="split"><div class="pmap"><div class="wwrap">${s}</div></div><div class="pside">`;
  if(window._ed)h+=editorNomesHTML();
  else if(WORLDS[sel]){const W=WORLDS[sel],pr=ALLPROG[sel]||{},base=Object.keys(W.chapters).filter(n=>!W.chapters[n].special),d=base.filter(n=>pr[n]).length;
-  h+=`<div class="lvcard"><div class="lvn">Planeta</div><div class="lvt">${W.icon} ${W.name}</div><div class="lvs">${W.desc}</div><div class="wheroes">${W.heroes.map(x=>faceDe(x)).join(' ')}</div><div class="lvs">⭐ ${d} de ${base.length} fases${d===base.length?' · 🏆':''}</div><button class="btn go" onclick="enterWorld('${sel}');go('menu')">🚀 Viajar para este mundo!</button></div><button class="btn reset" onclick="abrirNomes()">✏️ Personalizar nomes e dado</button>`}
+  h+=`<div class="lvcard"><div class="lvn">Planeta</div><div class="lvt">${W.icon} ${W.name}</div><div class="lvs">${W.desc}</div><div class="wheroes">${W.heroes.map(x=>faceDe(x)).join(' ')}</div><div class="lvs">⭐ ${d} de ${base.length} fases${d===base.length?' · 🏆':''}</div><button class="btn go" onclick="enterWorld('${sel}');go('menu')">🚀 Viajar para este mundo!</button></div><button class="btn reset" onclick="abrirAlbum()">📒 Álbum de amigos</button><button class="btn reset" onclick="abrirNomes()">✏️ Personalizar nomes e dado</button><div class="somlinha">${botaoSom()}</div>`}
  else h+=`<div class="lvcard"><div class="lvn">Planeta misterioso</div><div class="lvt">❓ Em breve</div><div class="lvs">Um novo mundo, com novos heróis e aventuras, está sendo criado...</div></div>`;
  h+=`</div></div>`;
  return h;
 }
-function startFrom(n){for(const k of Object.keys(CH).map(Number))if(k<n&&!PROG[k])PROG[k]={done:1,stars:0};saveProg();window._sel=n;go('menu')}
+function startFrom(n){for(const k of Object.keys(CH).map(Number))if(k<n&&!PROG[k])PROG[k]={done:1,stars:0,skip:1};saveProg();window._sel=n;go('menu')}
 
 function render(){
  const sc=SC[S.scene];
  $('app').className='wrap'+(sc.mundos?' wide gal':sc.menu?' wide map':'');if(sc.menu)$('app').style.setProperty('--sea',WORLDS[WORLD].map.sea);
+ if(sc.album){$('app').className='wrap alb';$('app').innerHTML=nomes(albumHTML());window.scrollTo(0,0);return}
  if(sc.mundos){$('app').innerHTML=nomes(worldsHTML());return}
  if(sc.menu){$('app').innerHTML=nomes(mapHTML());return}
  let h=hud();
@@ -291,7 +293,7 @@ function render(){
  } else {
   h+=`<div class="art">${sc.art}</div>${sc.title?`<div class="title">${sc.title}</div>`:''}<div class="story" id="narr">${txt(sc.text)}${S.extra?`\n\n<b class="good">${S.extra.trim()}</b>`:''}</div>`;
   if(sc.end){
-   let fmsg='';
+   let fmsg='';const novo=sc.gain&&!figuraGanha(sc.gain);
    if(sc.lose||sc.gain){PROG.lost=PROG.lost||{};
     if(sc.lose){PROG.lost[sc.lose]=1;fmsg=`<div class="fbox sad">💔 ${capz(FRIEND[sc.lose][0])} não virou amigo da equipe.<br>Nas próximas aventuras, não vai aparecer, até vocês jogarem este capítulo de novo e escolherem o final feliz.</div>`}
     if(sc.gain&&PROG.lost[sc.gain]){delete PROG.lost[sc.gain];fmsg=`<div class="fbox">💛 ${capz(FRIEND[sc.gain][0])} agora é amigo da equipe e volta para as próximas aventuras!</div>`}
@@ -301,6 +303,8 @@ function render(){
    const r=S.stars>=a?'🏆 Heróis Lendários!':S.stars>=b?'🥇 Heróis Super Corajosos!':'🎖️ Heróis do Reino!';
    h+=`<div class="rank">FIM! ${r}</div><div class="title">Vocês ganharam ⭐ ${S.stars} estrelas!</div>`;
    h+=fmsg;
+   if(novo)h+=figurinhaNovaHTML(sc.gain);
+   if(!S.festou){S.festou=1;setTimeout(()=>{if(sc.lose)tocar('ok');else{festaFim(S.stars);if(novo)setTimeout(()=>tocar('figurinha'),1100)}},60)}
    const nl=lockInfo(S.ch+1);
    if(CH[S.ch+1]&&CH[S.ch+1].soon){}
    else if(CH[S.ch+1]&&!nl)h+=`<button class="btn" onclick="newGame(${S.ch+1});go(CH[S.ch].start)">📖 Ir para o Capítulo ${S.ch+1} ➜</button>`;
@@ -310,19 +314,20 @@ function render(){
  }
  $('app').innerHTML=nomes(h+tools());
 }
-function choose(i){go(SC[S.scene].choices[i][1])}
+function choose(i){tocar('ok');go(SC[S.scene].choices[i][1])}
 function test(){
  if(busy)return;const T=SC[S.scene].test;
  roll(v=>{const ok=v>=T.need;
-  if(!ok&&!S.retried){S.retried=1;S.t={v,retry:1};render();return}
+  if(!ok&&!S.retried){S.retried=1;S.t={v,retry:1};render();tocar('erro');return}
   const o=ok?T.ok:T.fail;let extra=o.fx?o.fx():'';
-  S.t={v,ok,text:(ok&&S.retried?'Na segunda tentativa deu certo! 💪\n':'')+o.text+(extra?`\n<b>${extra.trim()}</b>`:''),go:o.go||T.next};render()},'Precisa tirar '+T.need+' ou mais');
+  S.t={v,ok,text:(ok&&S.retried?'Na segunda tentativa deu certo! 💪\n':'')+o.text+(extra?`\n<b>${extra.trim()}</b>`:''),go:o.go||T.next};render();
+  tocar(ok?'bom':'erro');if(ok){pula($('die'));if(v===6)confete(24,['⭐'])}},'Precisa tirar '+T.need+' ou mais');
 }
 function buzio(){
  const B=SC[S.scene].battle,b=S.b;S.f.buzioUsado=1;b.hp=Math.max(0,b.hp-2);
  b.msg='🐚 TUUUUUUM! O som do Búzio Mágico foi tão forte que o inimigo levou um susto! 💥';
  if(b.hp<=0){b.done=1;b.msg+=`\n\n🏆 ${B.win}`}
- render();$('ef').classList.add('hit');
+ render();$('ef').classList.add('hit');tocar('super');if(b.done)vence();
 }
 function attack(i){
  if(busy)return;const B=SC[S.scene].battle,b=S.b,x=heroes()[i];
@@ -334,6 +339,9 @@ function attack(i){
   if(b.hp<=0){b.hp=0;b.done=1;m+=`\n\n🏆 ${B.win}`}
   b.msg=m;render();
   if(r>2){const f=$('ef');f.classList.add('hit')}
+  else{const h=document.querySelector('.hud .hearts');if(h)h.classList.add('ai')}
+  tocar(r<=2?'erro':v===6||r>=5?'super':'bom');
+  if(b.done)vence();
  },'1-2: errou · 3-4: acertou · 5-6: SUPER ataque!');
 }
 function bestVoice(){

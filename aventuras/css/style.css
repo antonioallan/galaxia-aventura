@@ -143,3 +143,43 @@ body{margin:0;font-family:'Baloo 2',system-ui,sans-serif;background:linear-gradi
 .ddica{font-size:15px;font-weight:700;margin-top:12px;opacity:.8}
 .dadoov .btn{margin-top:12px}
 .dadoov .adjlink{display:block;margin:10px auto 0}
+/* ===== Sons ===== */
+.somtog{flex:1;border:0;border-radius:14px;padding:9px;font:inherit;font-size:16px;font-weight:700;background:#ffffffcc;color:var(--ink);cursor:pointer}
+.somlinha{margin-top:10px}
+.somlinha .somtog{width:100%}
+/* ===== Comemoração ===== */
+.confete{position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden}
+.confete i{position:absolute;top:-24px;border-radius:2px;animation:cair linear forwards}
+.confete i.emo{background:none!important;font-style:normal;font-size:26px;width:auto;height:auto}
+@keyframes cair{to{transform:translate(var(--dx),110vh) rotate(var(--rot))}}
+.pula{animation:pula .7s ease-out}
+@keyframes pula{0%{transform:translateY(0) scale(1)}25%{transform:translateY(-26px) scale(1.12)}50%{transform:translateY(0) scale(.94)}70%{transform:translateY(-12px) scale(1.05)}100%{transform:translateY(0) scale(1)}}
+.enemy .face.amigo{animation:amigo 1.2s ease-out;position:relative}
+.enemy .face.amigo::after{content:'💛';position:absolute;font-size:30px;top:-6px;right:calc(50% - 70px);animation:subir 1.2s ease-out forwards}
+@keyframes amigo{0%{transform:scale(1)}30%{transform:scale(1.25) rotate(-8deg)}60%{transform:scale(1.15) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes subir{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-44px)}}
+.hearts.ai{animation:shake .45s}
+.rank{animation:pop2 .8s ease-out}
+@keyframes pop2{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+/* ===== Álbum de amigos ===== */
+.alb .maptop{margin-bottom:10px}
+.albtxt{text-align:center;font-size:16px;font-weight:700;opacity:.8;margin-bottom:6px}
+.albmundo{font-size:20px;font-weight:800;margin:16px 0 8px;color:var(--pri)}
+.albmundo span{font-size:15px;color:var(--ink);opacity:.6;margin-left:6px}
+.albgrade{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.figcard{background:#fff;border-radius:18px;padding:10px 6px;text-align:center;box-shadow:0 4px 0 #0002;border:3px solid var(--gold);background:linear-gradient(160deg,#fff,#fff4d6)}
+.figcard .fig{font-size:46px;line-height:1.15}
+.figcard .fignm{font-size:14px;font-weight:800;line-height:1.15;margin-top:2px}
+.figcard .figsub{font-size:12px;opacity:.55;margin-top:2px}
+.figcard.vazia{background:#ffffffaa;border:3px dashed #7b5cff44;box-shadow:none}
+.figcard.vazia .fig{filter:grayscale(1);opacity:.45}
+.figcard.vazia .fignm{opacity:.5}
+.figcard.nova{max-width:220px;margin:14px auto 0;animation:figin 1s ease-out;position:relative;overflow:hidden}
+.figcard.nova .fig{font-size:70px}
+.figcard.nova .fignm{font-size:18px}
+.figtag{font-size:14px;font-weight:800;color:var(--pri)}
+.figcard.nova::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,#ffffffcc,transparent);transform:skewX(-20deg);animation:brilho 1.6s .6s ease-out}
+@keyframes figin{0%{transform:scale(.2) rotate(-25deg);opacity:0}60%{transform:scale(1.15) rotate(6deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes brilho{to{left:140%}}
+@media (min-width:900px){.alb{max-width:760px}.albgrade{grid-template-columns:repeat(4,1fr)}}
+@media (prefers-reduced-motion:reduce){.pula,.enemy .face.amigo,.enemy .face.amigo::after,.hearts.ai,.rank,.figcard.nova,.figcard.nova::after{animation:none}}

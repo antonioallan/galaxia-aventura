@@ -32,6 +32,7 @@ for (const s of scripts) {
 }
 if (erros.length) fim();
 const get = expr => vm.runInContext(expr, ctx);
+const SEGS = typeof get('SEG') !== 'undefined' ? get('SEG') : [];
 const SC = get('SC'), ITEMS = get('ITEMS'), FRIEND = get('FRIEND'), FAILS = get('FAILS'), WORLDS = get('WORLDS');
 
 /* ---------- 2. grafo de cenas ---------- */
@@ -53,10 +54,11 @@ function saidas(id) {
   if (s.test) { add(s.test.next, 'test.next'); add(s.test.ok && s.test.ok.go, 'test.ok.go'); add(s.test.fail && s.test.fail.go, 'test.fail.go'); }
   if (s.battle) add(s.battle.next, 'battle.next');
   if (s.mini) add(s.mini.next, 'mini.next');
+  for (const o of SEGS) if (o.de === id) alvos.push([o.cena, 'segredo ' + o.id]);
   return alvos;
 }
 const ehFim = id => !!SC[id].end;
-const semSaida = id => { const s = SC[id]; return !s.end && !s.menu && !s.mundos && !s.album && !s.rec && !(s.choices && s.choices.length) && !s.test && !s.battle && !s.mini; };
+const semSaida = id => { const s = SC[id]; return !s.end && !s.menu && !s.mundos && !s.album && !s.rec && !(s.choices && s.choices.length) && !s.test && !s.battle && !s.mini && !s.segredo; };
 
 let dinamicos = 0;
 for (const id of Object.keys(SC)) {
@@ -176,6 +178,69 @@ if (typeof get('albumHTML') === 'function') {
 } else erro('album.js: função albumHTML() não encontrada');
 if (typeof get('tocar') !== 'function') erro('som.js: função tocar() não encontrada');
 else { try { get("tocar('dado')"); get("tocar('inexistente')"); } catch (e) { erro(`som.js: tocar() não pode falhar sem áudio (${e.message})`); } }
+
+/* ---------- 4e. liberação de mundos (req) ---------- */
+{
+  const sem = Object.entries(WORLDS).filter(([, W]) => !W.req).map(([id]) => id);
+  if (sem.length !== 1) erro(`liberação: deve haver exatamente 1 mundo inicial sem "req" (há ${sem.length}: ${sem.join(', ')})`);
+  for (const [id, W] of Object.entries(WORLDS)) {
+    const vistos = new Set([id]);
+    for (let q = W.req; q; q = WORLDS[q] && WORLDS[q].req) {
+      if (!WORLDS[q]) { erro(`liberação: mundo "${id}" exige "${q}", que não existe`); break; }
+      if (vistos.has(q)) { erro(`liberação: ciclo de "req" envolvendo "${q}"`); break; }
+      vistos.add(q);
+    }
+  }
+  if (typeof get('mundoLiberado') === 'function') {
+    const base = id => Object.keys(WORLDS[id].chapters).filter(n => !WORLDS[id].chapters[n].special && !WORLDS[id].chapters[n].soon);
+    const marca = (id, feitos) => { const pr = {}; feitos.forEach(n => pr[n] = { done: 1, stars: 1 }); get('ALLPROG')[id] = pr; };
+    const ids = Object.keys(WORLDS);
+    for (const id of ids) get('ALLPROG')[id] = {};
+    delete get('ALLPROG')._lib;
+    for (const id of ids.filter(i => WORLDS[i].req)) {
+      const q = WORLDS[id].req, bq = base(q);
+      if (get(`mundoLiberado('${id}')`)) erro(`liberação: "${id}" deve começar bloqueado`);
+      marca(q, bq.slice(0, -1));
+      if (get(`mundoLiberado('${id}')`)) erro(`liberação: "${id}" não deve abrir faltando um capítulo de "${q}"`);
+      marca(q, bq);
+      if (!get(`mundoLiberado('${id}')`)) erro(`liberação: "${id}" deve abrir ao concluir "${q}"`);
+      marca(q, []);
+      if (get(`mundoLiberado('${id}')`)) erro(`liberação: "${id}" deve voltar a bloquear sem o progresso de "${q}"`);
+      get('ALLPROG')[id] = { 1: { done: 1, stars: 1 } };
+      if (!get(`mundoLiberado('${id}')`)) erro(`liberação: quem já tem progresso em "${id}" não pode perder o acesso`);
+      get('ALLPROG')[id] = {};
+    }
+    for (const id of ids) get('ALLPROG')[id] = {};
+    delete get('ALLPROG')._lib;
+  } else erro('engine.js: função mundoLiberado() não encontrada');
+}
+
+/* ---------- 4f. segredos (segredos.js) ---------- */
+{
+  const ids = new Set();
+  if (!SEGS.length) erro('segredos.js: lista SEG vazia ou não encontrada');
+  for (const o of SEGS) {
+    const rot = `segredo "${o.id}"`;
+    if (ids.has(o.id)) erro(`${rot}: id repetido`); ids.add(o.id);
+    const W = WORLDS[o.mundo];
+    if (!W) { erro(`${rot}: mundo "${o.mundo}" não existe`); continue; }
+    const c = W.chapters[o.ch];
+    if (!c || c.soon) erro(`${rot}: capítulo ${o.ch} não existe em "${o.mundo}"`);
+    if (!o.label || !o.emoji || !o.nome) erro(`${rot}: falta label, emoji ou nome`);
+    const de = SC[o.de];
+    if (!de) erro(`${rot}: cena "${o.de}" (onde aparece o botão) não existe`);
+    else if (!Array.isArray(de.choices) || de.test || de.battle || de.mini || de.end) erro(`${rot}: a cena "${o.de}" precisa ter só escolhas (sem teste, batalha, mini-jogo ou fim)`);
+    const alvo = SC[o.cena];
+    if (!alvo) { erro(`${rot}: a cena "${o.cena}" não existe`); continue; }
+    if (alvo.segredo !== o.id) erro(`${rot}: a cena "${o.cena}" deve ter segredo:'${o.id}'`);
+    if (alvo.end) { if (!alvo.gain && !alvo.lose) aviso(`${rot}: final secreto sem gain/lose`); }
+    else if (alvo.choices || alvo.test || alvo.battle || alvo.mini) erro(`${rot}: cena de tesouro não pode ter saída própria (volta sozinha para "${o.de}")`);
+    else if (o.item && !ITEMS[o.item]) erro(`${rot}: item "${o.item}" não existe em ITEMS`);
+    else if (!o.item) aviso(`${rot}: sem item bônus`);
+  }
+  for (const id of Object.keys(SC)) if (SC[id].segredo && !SEGS.some(o => o.cena === id)) erro(`cena "${id}" tem segredo mas não está em SEG`);
+  for (const w of Object.keys(WORLDS)) if (!SEGS.some(o => o.mundo === w)) aviso(`mundo "${w}" não tem nenhum segredo`);
+}
 
 /* ---------- 5. arquivos do modo offline (sw.js) ---------- */
 const sw = fs.readFileSync(path.join(RAIZ, 'sw.js'), 'utf8');

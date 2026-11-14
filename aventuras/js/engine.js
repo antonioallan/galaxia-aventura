@@ -61,9 +61,10 @@ function count(){S.cnt.n++;return ` (+1 ${S.cnt.icon}: ${S.cnt.n} de ${S.cnt.of}
 function reset(){newGame(1);go('menu')}
 function go(id){
  if(typeof id==='function')id=id();
- S.scene=id;S.extra='';S.t=null;S.retried=0;S.festou=0;S.mj=null;
+ S.scene=id;S.extra='';S.t=null;S.retried=0;S.festou=0;S.mj=null;S.novosMundos=null;
  const sc=SC[id];
  if(sc.enter)S.extra=sc.enter();
+ if(sc.segredo)S.extra=(S.extra||'')+segEntra(sc.segredo);
  if(sc.mini)S.mj=miniNovo(sc.mini);
  if(sc.battle)S.b={hp:sc.battle.hp,msg:(S.rematch?'💪 Os heróis voltaram descansados! Hora da REVANCHE!\n\n':'')+sc.battle.intro,done:0,bonus:0};
  S.rematch=0;
@@ -155,6 +156,26 @@ const WORLDS={
   }
  }
 };
+/* ===== Liberação de mundos: cada mundo (W.req) só abre depois de concluir todos os capítulos normais do anterior ===== */
+function mundoCompleto(w){
+ const W=WORLDS[w],pr=ALLPROG[w]||{};
+ return Object.keys(W.chapters).filter(n=>!W.chapters[n].special&&!W.chapters[n].soon).every(n=>pr[n]&&pr[n].done);
+}
+/* liberado se: não exige nada, ou o anterior foi concluído (e isso fica salvo em ALLPROG._lib), ou já havia progresso nele (quem jogou antes desta regra) */
+function mundoLiberado(w){
+ const q=WORLDS[w].req;if(!q)return true;
+ if((ALLPROG._lib||{})[w]||mundoCompleto(q))return true;
+ const pr=ALLPROG[w]||{};
+ return Object.keys(pr).some(k=>/^\d+$/.test(k)&&pr[k]&&pr[k].done);
+}
+/* registra os mundos que acabaram de abrir e devolve os ids; chamada ao concluir um capítulo e ao carregar (sem avisar) */
+function liberaMundos(){
+ ALLPROG._lib=ALLPROG._lib||{};const novos=[];
+ for(const w in WORLDS){const q=WORLDS[w].req;if(q&&!ALLPROG._lib[w]&&mundoCompleto(q)){ALLPROG._lib[w]=1;novos.push(w)}}
+ if(novos.length)saveProg();
+ return novos;
+}
+function viajar(w){if(!mundoLiberado(w)){tocar('erro');return}enterWorld(w);go('menu')}
 function enterWorld(w){WORLD=w;const W=WORLDS[w];CH=W.chapters;HEROES=W.heroes;PROG=ALLPROG[w]||(ALLPROG[w]={});window._sel=0}
 function mapHTML(){
  const M=WORLDS[WORLD].map,base=Object.keys(CH).map(Number).filter(n=>!CH[n].special),extra=!!(M.extra&&PROG[M.extra.after]),ids=Object.keys(CH).map(Number).filter(n=>!CH[n].special||extra),doneN=ids.filter(n=>PROG[n]).length,next=ids.find(n=>!PROG[n]&&!CH[n].soon),all=base.every(n=>PROG[n]),MH=extra?M.extra.h:M.h,ICON=M.icons,NODEBG=M.colors;
@@ -209,7 +230,7 @@ function mapHTML(){
  const p=PROG[sel];
  let h=`<div class="maptop"><button class="back" onclick="go('mundos')">⬅ Mundos</button><div class="title">${WORLDS[WORLD].icon} ${WORLDS[WORLD].name}</div><div class="mapsub">⭐ ${doneN} de ${ids.length} fases concluídas</div>${extra&&!PROG[11]&&!PROG[12]?'<div class="unlock">✨ Novos capítulos especiais desbloqueados! ✨</div>':''}</div>`;
  h+=`<div class="split"><div class="pmap"><div class="wwrap">${s}</div></div><div class="pside">`;
- h+=`<div class="lvcard"><div class="lvn">${CH[sel].special?'✨ Capítulo especial '+sel:'Fase '+sel}</div><div class="lvt">${ICON[sel]} ${CH[sel].title}</div>${(()=>{if(CH[sel].soon)return `<div class="lvs">✨ Em breve</div><div class="fbox">Um capítulo extra vai chegar aqui! Novas aventuras estão sendo preparadas...</div>`;const L=lockInfo(sel);return L?`<div class="lvs">🔒 Fase bloqueada</div><div class="fbox sad">Para jogar esta fase, ${L.txt} precisa ser amigo da equipe. Jogue o Capítulo ${L.ch} de novo e escolha o final feliz!</div><button class="btn" onclick="startCh(${L.ch})">▶ Jogar o Capítulo ${L.ch}</button>`:`<div class="lvs">${p?(p.stars?`⭐ Concluída com ${p.stars} estrelas`:'✓ Concluída'):'Ainda não jogada'}</div><button class="btn go" onclick="startCh(${sel})">▶ Jogar!</button>`})()}<div class="lvhint">Toque numa fase do mapa para escolher</div></div>`;
+ h+=`<div class="lvcard"><div class="lvn">${CH[sel].special?'✨ Capítulo especial '+sel:'Fase '+sel}</div><div class="lvt">${ICON[sel]} ${CH[sel].title}</div>${(()=>{if(CH[sel].soon)return `<div class="lvs">✨ Em breve</div><div class="fbox">Um capítulo extra vai chegar aqui! Novas aventuras estão sendo preparadas...</div>`;const L=lockInfo(sel);return L?`<div class="lvs">🔒 Fase bloqueada</div><div class="fbox sad">Para jogar esta fase, ${L.txt} precisa ser amigo da equipe. Jogue o Capítulo ${L.ch} de novo e escolha o final feliz!</div><button class="btn" onclick="startCh(${L.ch})">▶ Jogar o Capítulo ${L.ch}</button>`:`<div class="lvs">${p?(p.stars?`⭐ Concluída com ${p.stars} estrelas`:'✓ Concluída'):'Ainda não jogada'}</div><button class="btn go" onclick="startCh(${sel})">▶ Jogar!</button>`})()}${segLinha(sel)}<div class="lvhint">Toque numa fase do mapa para escolher</div></div>`;
  h+=`<button class="btn reset" onclick="abrirAlbum()">📒 Álbum de amigos</button><button class="btn reset" onclick="resetProg(this)">🔄 Reiniciar fases</button>`;
  h+=`<div class="adj"><button class="adjlink" onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">⚙️ já jogamos algumas fases</button><div hidden class="adjbox">Em qual fase vocês estão?<br><small>As fases antes dela ficam marcadas como concluídas.</small><div class="adjgrid">${ids.map(n=>`<button onclick="startFrom(${n})">${n}</button>`).join('')}</div></div></div>`;
  h+=`</div></div>`;
@@ -218,7 +239,7 @@ function mapHTML(){
 }
 function selCh(n){window._sel=n;render()}
 SC.mundos={mundos:1};SC.album={album:1};
-function planetSVG(id,P,sel){
+function planetSVG(id,P,sel,locked){
  const {x,y,r}=P;let g='';
  g+=`<defs><radialGradient id="pg_${id}" cx="34%" cy="28%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".3" stop-color="${P.sea}"/><stop offset="1" stop-color="${P.dark}"/></radialGradient>
 <radialGradient id="ps_${id}" cx="30%" cy="25%" r="95%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0a0630" stop-opacity=".55"/></radialGradient>
@@ -236,14 +257,19 @@ function planetSVG(id,P,sel){
  g+=`<circle cx="${x}" cy="${y}" r="${r}" fill="url(#ps_${id})"/></g>`;
  g+=ring(true);
  if(P.top)g+=`<text x="${x}" y="${y-r-r*.12}" font-size="${r*.5}" text-anchor="middle" dominant-baseline="central">${P.top}</text>`;
+ if(locked)g+=`<text x="${x}" y="${y}" font-size="${r*.9}" text-anchor="middle" dominant-baseline="central">🔒</text>`;
  if(P.mystery)g+=`<text x="${x}" y="${y+2}" font-size="${r*1.1}" font-weight="800" fill="#ffffffcc" text-anchor="middle" dominant-baseline="central">?</text>`;
  if(sel){g+=`<circle cx="${x}" cy="${y}" r="${r+16}" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="6 6"><animateTransform attributeName="transform" type="rotate" from="0 ${x} ${y}" to="360 ${x} ${y}" dur="12s" repeatCount="indefinite"/></circle>`;
   g+=`<g><animateTransform attributeName="transform" type="rotate" from="0 ${x} ${y}" to="360 ${x} ${y}" dur="7s" repeatCount="indefinite"/><text x="${x}" y="${y-r-30}" font-size="22" text-anchor="middle" dominant-baseline="central" transform="rotate(90 ${x} ${y-r-30})">🚀</text></g>`}
  g+=`<text x="${x}" y="${y+r+(P.ring?30:24)}" font-size="15" font-weight="800" fill="#fff" text-anchor="middle" style="paint-order:stroke" stroke="#1a1446" stroke-width="4">${P.label}</text>`;
- return `<g class="lv" onclick="selWorld('${id}')">${g}</g>`;
+ return `<g class="lv" onclick="selWorld('${id}')"${locked?' opacity=".55"':''}>${g}</g>`;
 }
 const MYSTERY=[
  {x:78,y:470,r:28,sea:'#8a9aa8',dark:'#45566a',craters:[[.2,.2,.25]],mystery:1,label:'Em breve'}];
+function bloqueioHTML(W){
+ const Q=WORLDS[W.req],pr=ALLPROG[W.req]||{},base=Object.keys(Q.chapters).filter(n=>!Q.chapters[n].special&&!Q.chapters[n].soon),d=base.filter(n=>pr[n]&&pr[n].done).length;
+ return `<div class="lvs">🔒 Mundo bloqueado</div><div class="fbox sad">Para viajar até aqui, termine todas as fases do ${Q.icon} ${Q.name}!<br>Faltam ${base.length-d} de ${base.length}.</div><button class="btn" onclick="selWorld('${W.req}')">Ir para o ${Q.name} ➜</button>`;
+}
 function selWorld(w){window._wsel=w;render()}
 function worldsHTML(){
  if(!window._wsel)window._wsel=WORLD;
@@ -256,12 +282,12 @@ function worldsHTML(){
   s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}" fill="#fff" opacity="${(.4+rnd()*.6).toFixed(2)}">${tw?`<animate attributeName="opacity" values="1;.2;1" dur="${(2+rnd()*3).toFixed(1)}s" repeatCount="indefinite"/>`:''}</circle>`}
  s+=`<g opacity="0"><animate attributeName="opacity" values="0;1;0;0" keyTimes="0;.05;.12;1" dur="7s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 0;160 70;160 70" keyTimes="0;.12;1" dur="7s" repeatCount="indefinite"/><line x1="40" y1="40" x2="80" y2="58" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>`;
  for(const [i,M] of MYSTERY.entries())s+=planetSVG('m'+i,M,sel==='m'+i);
- for(const w in WORLDS)s+=planetSVG(w,WORLDS[w].planet,sel===w);
+ for(const w in WORLDS)s+=planetSVG(w,WORLDS[w].planet,sel===w,!mundoLiberado(w));
  s+=`</svg>`;
  let h=`<div class="maptop"><div class="title">🌌 Galáxia das Aventuras</div><div class="mapsub">Toque num planeta para escolher o mundo</div></div><div class="split"><div class="pmap"><div class="wwrap">${s}</div></div><div class="pside">`;
  if(window._ed)h+=editorNomesHTML();
- else if(WORLDS[sel]){const W=WORLDS[sel],pr=ALLPROG[sel]||{},base=Object.keys(W.chapters).filter(n=>!W.chapters[n].special),d=base.filter(n=>pr[n]).length;
-  h+=`<div class="lvcard"><div class="lvn">Planeta</div><div class="lvt">${W.icon} ${W.name}</div><div class="lvs">${W.desc}</div><div class="wheroes">${W.heroes.map(x=>faceDe(x)).join(' ')}</div><div class="lvs">⭐ ${d} de ${base.length} fases${d===base.length?' · 🏆':''}</div><button class="btn go" onclick="enterWorld('${sel}');go('menu')">🚀 Viajar para este mundo!</button></div><button class="btn reset" onclick="abrirAlbum()">📒 Álbum de amigos</button><button class="btn reset" onclick="abrirNomes()">✏️ Personalizar nomes e dado</button><div class="somlinha">${botaoSom()}</div>`}
+ else if(WORLDS[sel]){const W=WORLDS[sel],pr=ALLPROG[sel]||{},base=Object.keys(W.chapters).filter(n=>!W.chapters[n].special),d=base.filter(n=>pr[n]).length,lk=!mundoLiberado(sel);
+  h+=`<div class="lvcard"><div class="lvn">Planeta</div><div class="lvt">${W.icon} ${W.name}</div><div class="lvs">${W.desc}</div><div class="wheroes">${W.heroes.map(x=>faceDe(x)).join(' ')}</div><div class="lvs">⭐ ${d} de ${base.length} fases${d===base.length?' · 🏆':''}</div>${lk?bloqueioHTML(W):`<button class="btn go" onclick="viajar('${sel}')">🚀 Viajar para este mundo!</button>`}</div><button class="btn reset" onclick="abrirAlbum()">📒 Álbum de amigos</button><button class="btn reset" onclick="abrirNomes()">✏️ Personalizar nomes e dado</button><div class="somlinha">${botaoSom()}</div>`}
  else h+=`<div class="lvcard"><div class="lvn">Planeta misterioso</div><div class="lvt">❓ Em breve</div><div class="lvs">Um novo mundo, com novos heróis e aventuras, está sendo criado...</div></div>`;
  h+=`</div></div>`;
  return h;
@@ -316,22 +342,27 @@ function render(){
     if(sc.gain&&PROG.lost[sc.gain]){delete PROG.lost[sc.gain];fmsg=`<div class="fbox">💛 ${capz(FRIEND[sc.gain][0])} agora é amigo da equipe e volta para as próximas aventuras!</div>`}
     saveProg()}
    markDone(S.ch,S.stars);
+   const nm=liberaMundos();if(nm.length)S.novosMundos=nm;
    const [a,b]=CH[S.ch].rank;
    const r=S.stars>=a?'🏆 Heróis Lendários!':S.stars>=b?'🥇 Heróis Super Corajosos!':'🎖️ Heróis do Reino!';
    h+=`<div class="rank">FIM! ${r}</div><div class="title">Vocês ganharam ⭐ ${S.stars} estrelas!</div>`;
    h+=fmsg;
+   h+=segFimHTML(S.ch);
    if(novo)h+=figurinhaNovaHTML(sc.gain);
-   if(!S.festou){S.festou=1;setTimeout(()=>{if(sc.lose)tocar('ok');else{festaFim(S.stars);if(novo)setTimeout(()=>tocar('figurinha'),1100)}},60)}
+   if(S.novosMundos)h+=S.novosMundos.map(w=>`<div class="fbox novomundo">🌟 NOVO MUNDO LIBERADO! 🌟<br>${WORLDS[w].icon} ${WORLDS[w].name}</div><button class="btn" onclick="window._wsel='${w}';go('mundos')">🪐 Ver o novo planeta</button>`).join('');
+   if(!S.festou){S.festou=1;setTimeout(()=>{if(sc.lose)tocar('ok');else{festaFim(S.stars);if(novo||S.novosMundos)setTimeout(()=>tocar('figurinha'),1100)}},60)}
    const nl=lockInfo(S.ch+1);
    if(CH[S.ch+1]&&CH[S.ch+1].soon){}
    else if(CH[S.ch+1]&&!nl)h+=`<button class="btn" onclick="newGame(${S.ch+1});go(CH[S.ch].start)">📖 Ir para o Capítulo ${S.ch+1} ➜</button>`;
    else if(CH[S.ch+1])h+=`<div class="fbox sad">🔒 O Capítulo ${S.ch+1} ficou bloqueado: ${nl.txt} precisa ser amigo da equipe.</div>`;
    h+=`<div class="ask">⭐ Fase ${S.ch} concluída no mapa!</div><button class="btn go" onclick="reset()">🗺️ Voltar ao mapa</button>`;
-  } else sc.choices.forEach((c,i)=>{if(c[2]&&!amigo(c[2]))return;h+=`<button class="btn ${i?'b2':''}" onclick="choose(${i})">${c[0]}</button>`});
+  } else if(sc.segredo)h+=`<button class="btn go" onclick="voltarSeg()">↩️ Voltar para a aventura</button>`;
+  else{sc.choices.forEach((c,i)=>{if(c[2]&&!amigo(c[2]))return;h+=`<button class="btn ${i?'b2':''}" onclick="choose(${i})">${c[0]}</button>`});h+=segBotoes()}
  }
  $('app').innerHTML=nomes(h+tools());
  vigiaInimigo();
  if(S.fada){S.fada=0;festaFada()}
+ if(S.segNovo){S.segNovo=0;festaSegredo()}
 }
 function choose(i){tocar('ok');go(SC[S.scene].choices[i][1])}
 function test(){
@@ -381,4 +412,4 @@ function speak(){
    speechSynthesis.speak(u)};
   next(0)}catch(e){}
 }
-window.addEventListener('load',()=>{loadProg();enterWorld('reino');newGame(1);go('mundos')});
+window.addEventListener('load',()=>{loadProg();liberaMundos();enterWorld('reino');newGame(1);go('mundos')});

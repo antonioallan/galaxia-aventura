@@ -146,7 +146,7 @@ Object.assign(SC,{
  m4_final_embora:E({lose:'cavoucao',art:'🧺🦫',text:'Vocês pegaram o '+peca(4)+' e foram embora. 🦫\n\nO Cavoucão ficou sentado entre os túneis cheios de água, sem saber por onde começar... 💧\n\nNa saída da caverna, tinha um olhinho desenhado 👀 apontando para a COLINA QUENTINHA. ☀️\n\n(Que tal jogar de novo e ajudar o Cavoucão a cavar o canal?)'})
 });
 
-WORLDS.monstrinhos={id:'monstrinhos',name:'Planeta Monstrinhos',icon:'👾',desc:'Gominha, Pedregulho e Baiacão, três monstrinhos amigos, viajam pelo planeta para consertar o Cesto Grande do Piquenique e fazer novos amigos.',bg:'linear-gradient(135deg,#9a8cf0,#ff9ad0 55%,#ffe27a)',
+WORLDS.monstrinhos={id:'monstrinhos',req:'florescer',name:'Planeta Monstrinhos',icon:'👾',desc:'Gominha, Pedregulho e Baiacão, três monstrinhos amigos, viajam pelo planeta para consertar o Cesto Grande do Piquenique e fazer novos amigos.',bg:'linear-gradient(135deg,#9a8cf0,#ff9ad0 55%,#ffe27a)',
  heroes:HEROES3,chapters:CH3,
  planet:{x:322,y:392,r:46,label:'Planeta Monstrinhos',sea:'#9a8cf0',dark:'#3b2f8a',glow:'#ff8fd0',top:'👾',
   lands:[[-.4,-.15,.4,.28,'#8fe3a8'],[.35,.3,.36,.24,'#ff9ad0'],[.1,-.55,.28,.15,'#ffe27a'],[-.2,.55,.3,.14,'#8fd6ff']],

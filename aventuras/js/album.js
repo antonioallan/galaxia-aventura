@@ -41,7 +41,7 @@ function albumHTML(){
     :`<div class="figcard vazia"><div class="fig">❓</div><div class="fignm">Amigo secreto</div><div class="figsub">Capítulo ${FRIEND[k][1]}</div></div>`}
   corpo+=`</div>`}
  return `<div class="maptop"><button class="back" onclick="fecharAlbum()">⬅ Voltar</button><div class="title">📒 Álbum de Amigos</div><div class="mapsub">${tem} de ${total} amigos${tem===total&&total?' · 🏆 Álbum completo!':''}</div></div>`+
-  `<div class="albtxt">Nos finais felizes, quem era inimigo vira amigo. Cada amigo ganha uma figurinha!</div>${corpo}`;
+  `<div class="albtxt">Nos finais felizes, quem era inimigo vira amigo. Cada amigo ganha uma figurinha!</div>${corpo}${typeof segAlbumHTML==='function'?segAlbumHTML():''}`;
 }
 function abrirAlbum(){window._albumDe=S.scene;tocar('ok');go('album')}
 function fecharAlbum(){tocar('ok');go(window._albumDe||'mundos')}

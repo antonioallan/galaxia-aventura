@@ -219,3 +219,13 @@ body{margin:0;font-family:'Baloo 2',system-ui,sans-serif;background:linear-gradi
 .hearts.curou{animation:curou 1.4s ease-out}
 @keyframes curou{0%,100%{filter:none;transform:scale(1)}25%{filter:drop-shadow(0 0 10px #ffd23f) brightness(1.3);transform:scale(1.18)}60%{filter:drop-shadow(0 0 14px #fff) brightness(1.4);transform:scale(1.08)}}
 @media (prefers-reduced-motion:reduce){.hearts.curou{animation:none}}
+/* ===== Mundo novo liberado ===== */
+.fbox.novomundo{background:linear-gradient(135deg,#fff4d6,#ffe0f0);border:3px solid var(--gold);font-size:19px;animation:pop2 .8s ease-out}
+/* ===== Segredos ===== */
+.btn.secreto{background:#ffffffb0;color:var(--pri);box-shadow:none;border:3px dashed #7b5cff88;font-size:17px;padding:11px}
+.btn.secreto:active{transform:none;background:#efe9ff}
+.segline{font-size:15px;font-weight:800;margin-top:6px;color:var(--pri)}
+.segline small{font-weight:600;opacity:.65}
+.fbox.seg{background:#efe9ff}
+.albsecao{font-size:24px;font-weight:800;text-align:center;color:var(--pri);margin:28px 0 4px}
+.figcard.seg{background:linear-gradient(160deg,#fff,#efe9ff);border-color:var(--pri)}

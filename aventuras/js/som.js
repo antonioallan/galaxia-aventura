@@ -50,6 +50,8 @@ const SONS={
  pad(ac,i){_nota(ac,[330,392,494,587][i||0],0,.38,'triangle',.18)},
  /* a Fada Luzinha aparece: sininhos subindo e um brilho no final */
  fada(ac){[0,1,2,3,4,5,6].forEach(i=>_nota(ac,_N.sol*(1+i*.12),i*.09,.45,'sine',.1));[_N.do2,_N.mi2,_N.sol2].forEach((f,i)=>_nota(ac,f,.7+i*.08,.9,'triangle',.07))},
+ /* segredo encontrado: arpejo misterioso que sobe */
+ segredo(ac){[_N.mi,_N.sol,_N.si,_N.mi2,_N.sol2].forEach((f,i)=>_nota(ac,f,i*.11,.4,'triangle',.13));[_N.mi2,_N.si*2].forEach((f,i)=>_nota(ac,f,.65+i*.06,.8,'sine',.08))},
  cura(ac){_nota(ac,_N.do,0,.12,'sine',.12);_nota(ac,_N.mi,.1,.12,'sine',.12);_nota(ac,_N.sol,.2,.2,'sine',.12)}
 };
 function tocar(nome,arg){

@@ -137,3 +137,22 @@ Progresso salvo em `localStorage` na chave `rpg_mundos_prog` (os nomes escolhido
 - O repositório git foi iniciado, mas ainda sem commits. Não há testes automatizados de jogo; a verificação de conteúdo é feita por `tools/validar.js`.
 - Ao alterar qualquer arquivo do jogo, aumente `CACHE` em `aventuras/sw.js` para os jogadores receberem a versão nova.
 - Todo o conteúdo e a lógica ficam no cliente; basta servir a pasta `aventuras/` como arquivos estáticos para publicar.
+
+## Liberação de mundos
+
+Cada mundo só abre depois de concluir **todos os capítulos normais** (os especiais não contam) do mundo anterior: Reino das Cores → Planeta Florescer → Planeta Monstrinhos.
+
+- Cada mundo declara `req:'id-do-mundo-anterior'` em `WORLDS` (o primeiro não tem `req`). Para um mundo novo, basta pôr o `req` dele.
+- `mundoCompleto(w)`, `mundoLiberado(w)` e `liberaMundos()` ficam em `engine.js`. Na galáxia, o planeta bloqueado aparece apagado com 🔒, e o cartão mostra quantas fases faltam e um botão para ir ao mundo anterior. `viajar(w)` recusa a entrada.
+- Ao concluir o último capítulo do mundo anterior, o fim do capítulo mostra "🌟 NOVO MUNDO LIBERADO!" com um botão para ver o planeta.
+- O desbloqueio fica salvo em `ALLPROG._lib` (chave `rpg_mundos_prog`), então "Reiniciar fases" não tranca de novo. Quem já tinha progresso num mundo antes desta regra continua com acesso.
+- O `validar.js` confere que existe um único mundo inicial, que não há ciclos e que as regras abrem e fecham como esperado.
+
+## Segredos e finais secretos (`js/segredos.js`)
+
+Em cada capítulo normal há uma **escolha misteriosa** (botão tracejado) que leva a uma cena escondida com um **tesouro bônus**. Alguns capítulos finais também têm um **final secreto**. São 31 segredos: 28 tesouros (10 no Reino, 10 no Florescer, 8 nos Monstrinhos) e 3 finais secretos (O Rei das Cores, O Desejo para Todos os Mundos, A Toalha Dourada).
+
+- **Como se registra:** `seg({id, mundo, ch, de, label, emoji, nome, item, art, text})` no fim de `segredos.js`. `de` é a cena (só com escolhas) onde o botão aparece. Final secreto: escreva a cena em `SC` com `end:1`, `gain` e `segredo:'id'`, e registre com `cena:'id_da_cena'`.
+- **Efeito:** achar dá +1 ⭐ na partida, um item bônus (`s_sorte`, `s_gema`, `s_escudo`, `s_brilho`), som e chuva de chaves e tesouros. A cena de tesouro volta sozinha para a cena de origem (`voltarSeg()`), sem repetir estrelas ou itens dessa cena. O botão some depois de usado na partida.
+- **Registro:** fica em `PROG.segredos` (por mundo). Aparece como "🗝️ Segredos: x de y" no cartão do capítulo no mapa, no fim do capítulo (com um incentivo para jogar de novo) e numa seção do álbum, com "❓ Segredo escondido" para os que faltam.
+- O `validar.js` confere que cada segredo tem capítulo, cena de origem só com escolhas, cena de destino com a marca certa e item existente.

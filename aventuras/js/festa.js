@@ -51,6 +51,8 @@ function festaFada(){
   setTimeout(()=>box.remove(),5000);
  }catch(e){}
 }
+/* achou um segredo: sininho misterioso e chuva de chaves e tesouros */
+function festaSegredo(){tocar('segredo');confete(36,['🗝️','✨','💎','🪙'])}
 /* vitória na batalha: o inimigo derrotado vira amigo, confete e fanfarra */
 function festaBatalha(){tocar('vitoria');confete(40,['⭐','✨'])}
 /* fim de capítulo: confete grande */

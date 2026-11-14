@@ -335,7 +335,7 @@ Object.assign(SC,{
  f10_final_doces:E({art:'🍭🏰',text:'O fruto brilhou e apareceu um castelo de doces enorme! 🍭🏰\n\nMas... o Trovãozinho continuou chorando, e o Tico ficou olhando o céu, sozinho. 🦊💧\nO castelo era gostoso, mas ninguém conseguiu ficar feliz de verdade. 😔\n\nA Liv entendeu: "O melhor desejo é aquele que deixa os outros felizes também." 💖\n\n(Que tal jogar de novo e fazer o desejo pelos amigos?)'})
 });
 
-WORLDS.florescer={id:'florescer',name:'Planeta Florescer',icon:'🌸',desc:'Liv, Lia e a esquilinha Bolota viajam pelo planeta atrás das 9 Folhas Douradas da Árvore dos Desejos.',bg:'linear-gradient(135deg,#7fd1c7,#c7b3ff 55%,#ffd27a)',
+WORLDS.florescer={id:'florescer',req:'reino',name:'Planeta Florescer',icon:'🌸',desc:'Liv, Lia e a esquilinha Bolota viajam pelo planeta atrás das 9 Folhas Douradas da Árvore dos Desejos.',bg:'linear-gradient(135deg,#7fd1c7,#c7b3ff 55%,#ffd27a)',
  heroes:HEROES2,chapters:CH2,
  planet:{x:300,y:130,r:54,label:'Planeta Florescer',sea:'#7fd1c7',dark:'#2c7a80',glow:'#ffb3d9',ring:['#ffd166','#ffe9a8'],top:'🌳',
   lands:[[-.4,-.2,.42,.3,'#a6e37f'],[.35,.32,.38,.25,'#c7b3ff'],[.12,-.55,.3,.16,'#ffd27a'],[-.25,.52,.3,.15,'#ffe1a8']],

@@ -1,6 +1,6 @@
 /* Service worker: guarda o jogo todo para funcionar offline.
    Ao mudar qualquer arquivo, aumente CACHE para os jogadores receberem a versão nova. */
-const CACHE = 'galaxia-aventura-v11';
+const CACHE = 'galaxia-aventura-v12';
 const ARQUIVOS = [
   './', 'index.html', 'manifest.webmanifest',
   'css/fonts.css', 'css/style.css',

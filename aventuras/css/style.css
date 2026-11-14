@@ -229,3 +229,7 @@ body{margin:0;font-family:'Baloo 2',system-ui,sans-serif;background:linear-gradi
 .fbox.seg{background:#efe9ff}
 .albsecao{font-size:24px;font-weight:800;text-align:center;color:var(--pri);margin:28px 0 4px}
 .figcard.seg{background:linear-gradient(160deg,#fff,#efe9ff);border-color:var(--pri)}
+/* ===== Recomeçar tudo (galáxia) ===== */
+.zerar{text-align:center;margin-top:18px}
+.zerar .adjlink{font-size:13px;opacity:.4}
+.gal .zerar .adjlink{color:#fff}

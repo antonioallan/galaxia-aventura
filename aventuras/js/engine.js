@@ -289,8 +289,21 @@ function worldsHTML(){
  else if(WORLDS[sel]){const W=WORLDS[sel],pr=ALLPROG[sel]||{},base=Object.keys(W.chapters).filter(n=>!W.chapters[n].special),d=base.filter(n=>pr[n]).length,lk=!mundoLiberado(sel);
   h+=`<div class="lvcard"><div class="lvn">Planeta</div><div class="lvt">${W.icon} ${W.name}</div><div class="lvs">${W.desc}</div><div class="wheroes">${W.heroes.map(x=>faceDe(x)).join(' ')}</div><div class="lvs">⭐ ${d} de ${base.length} fases${d===base.length?' · 🏆':''}</div>${lk?bloqueioHTML(W):`<button class="btn go" onclick="viajar('${sel}')">🚀 Viajar para este mundo!</button>`}</div><button class="btn reset" onclick="abrirAlbum()">📒 Álbum de amigos</button><button class="btn reset" onclick="abrirNomes()">✏️ Personalizar nomes e dado</button><div class="somlinha">${botaoSom()}</div>`}
  else h+=`<div class="lvcard"><div class="lvn">Planeta misterioso</div><div class="lvt">❓ Em breve</div><div class="lvs">Um novo mundo, com novos heróis e aventuras, está sendo criado...</div></div>`;
+ if(!window._ed)h+=`<div class="zerar"><button class="adjlink" onclick="reiniciarTudo(this)">↺ recomeçar tudo do zero</button></div>`;
  h+=`</div></div>`;
  return h;
+}
+/* apaga TODOS os progressos (fases, estrelas, amizades, segredos e mundos liberados) e volta ao primeiro mundo; nomes, dado e sons não mudam */
+function reiniciarTudo(btn){
+ if(btn.dataset.c){
+  ALLPROG={};
+  try{localStorage.removeItem('rpg_mundos_prog');localStorage.removeItem('rpg_bilu_prog')}catch(e){}
+  enterWorld('reino');window._wsel='reino';window._ed=0;
+  newGame(1);go('mundos');window.scrollTo(0,0);
+  return;
+ }
+ btn.dataset.c=1;btn.textContent='⚠️ Toque de novo para apagar TODO o progresso';
+ setTimeout(()=>{if(btn.isConnected){delete btn.dataset.c;btn.textContent='↺ recomeçar tudo do zero'}},4000);
 }
 function startFrom(n){for(const k of Object.keys(CH).map(Number))if(k<n&&!PROG[k])PROG[k]={done:1,stars:0,skip:1};saveProg();window._sel=n;go('menu')}
 

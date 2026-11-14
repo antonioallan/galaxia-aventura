@@ -336,8 +336,22 @@ function attack(i){
   if(r>2){const f=$('ef');f.classList.add('hit')}
  },'1-2: errou · 3-4: acertou · 5-6: SUPER ataque!');
 }
+function bestVoice(){
+ const vs=speechSynthesis.getVoices().filter(v=>/^pt[-_]BR$/i.test(v.lang));
+ const score=v=>(/natural|neural/i.test(v.name)?50:0)+(/online/i.test(v.name)?20:0)+(/francisca|thalita|antonio/i.test(v.name)?15:0)+(/google/i.test(v.name)?10:0)+(/luciana|premium|enhanced|aprimorad/i.test(v.name)?10:0);
+ return vs.sort((a,b)=>score(b)-score(a))[0]||null}
+if(window.speechSynthesis)speechSynthesis.getVoices();
+let _sp=0;
 function speak(){
  try{const t=$('narr').innerText.replace(/\p{Extended_Pictographic}|️|‍/gu,'');
-  speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';u.rate=.9;speechSynthesis.speak(u)}catch(e){}
+  speechSynthesis.cancel();const id=++_sp,v=bestVoice();
+  const parts=t.split(/\n+|(?<=[.!?…])\s+/).map(s=>s.trim()).filter(Boolean);
+  const next=i=>{if(id!==_sp||i>=parts.length)return;
+   const u=new SpeechSynthesisUtterance(parts[i]);u.lang='pt-BR';if(v)u.voice=v;
+   u.rate=.95;u.pitch=1.1;
+   const gap=/[.!?…]$/.test(parts[i])?350:150;
+   u.onend=()=>setTimeout(()=>next(i+1),gap);u.onerror=()=>{};
+   speechSynthesis.speak(u)};
+  next(0)}catch(e){}
 }
 window.addEventListener('load',()=>{loadProg();enterWorld('reino');newGame(1);go('mundos')});

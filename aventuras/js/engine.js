@@ -53,7 +53,7 @@ const FAILS={
 function star(){S.stars++;return ' (+1 ⭐)'}
 function hurt(){
  S.hearts--;if(S.hearts>0)return ' (-1 ❤️)';
- if(S.fadas<3){S.fadas++;S.hearts=3;return ` (-1 ❤️)\n\n🧚 A Fada Luzinha apareceu e deu 3 corações de volta! (ajuda ${S.fadas} de 3)`+(S.fadas===3?'\nEssa foi a última ajuda da fada! Cuidado!':'')}
+ if(S.fadas<3){S.fadas++;S.hearts=3;S.fada=1;return ` (-1 ❤️)\n\n🧚 A Fada Luzinha apareceu e deu 3 corações de volta! (ajuda ${S.fadas} de 3)`+(S.fadas===3?'\nEssa foi a última ajuda da fada! Cuidado!':'')}
  S.hearts=0;S.down=1;return ' (-1 ❤️)\n\n😴 Os heróis ficaram sem nenhuma força...\nA fada já ajudou 3 vezes. Hora de descansar!';
 }
 function newGame(ch){S={hearts:5,max:5,stars:0,f:{},inv:{},die:6,ch,fadas:0,down:0,cnt:null}}
@@ -331,6 +331,7 @@ function render(){
  }
  $('app').innerHTML=nomes(h+tools());
  vigiaInimigo();
+ if(S.fada){S.fada=0;festaFada()}
 }
 function choose(i){tocar('ok');go(SC[S.scene].choices[i][1])}
 function test(){

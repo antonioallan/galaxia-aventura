@@ -29,6 +29,28 @@ function pula(el){
  if(!el||_semMovimento())return;
  el.classList.remove('pula');void el.offsetWidth;el.classList.add('pula');
 }
+/* a Fada Luzinha ajudou: chuva de brilho dourado, fadinha cruzando a tela e corações brilhando */
+function festaFada(){
+ setTimeout(()=>tocar('fada'),350);
+ const h=document.querySelector('.hud .hearts');
+ if(h&&!_semMovimento()){h.classList.remove('curou');void h.offsetWidth;h.classList.add('curou')}
+ if(_semMovimento())return;
+ try{
+  const box=document.createElement('div');box.className='brilhos';box.setAttribute('aria-hidden','true');
+  const fada=document.createElement('b');fada.className='fadavoa';fada.textContent='🧚';box.appendChild(fada);
+  for(let i=0;i<46;i++){
+   const p=document.createElement('i'),emo=i%3===0;
+   p.style.left=(Math.random()*100)+'%';
+   p.style.animationDuration=(2.2+Math.random()*1.8)+'s';
+   p.style.animationDelay=(.2+Math.random()*1.1)+'s';
+   p.style.setProperty('--dx',(Math.random()*80-40)+'px');
+   if(emo){p.className='emo';p.textContent=['✨','🌟','💫'][i%9/3|0]}
+   else{const t=3+Math.random()*5;p.style.width=p.style.height=t+'px'}
+   box.appendChild(p)}
+  document.body.appendChild(box);
+  setTimeout(()=>box.remove(),5000);
+ }catch(e){}
+}
 /* vitória na batalha: o inimigo derrotado vira amigo, confete e fanfarra */
 function festaBatalha(){tocar('vitoria');confete(40,['⭐','✨'])}
 /* fim de capítulo: confete grande */
